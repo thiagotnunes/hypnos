@@ -1,13 +1,16 @@
 (ns oizys.core)
 
+(defn- third [coll]
+  (nth coll 2))
+
 (defn- split-checks [body]
   (partition 3 body))
 
-(defn- actual [body]
-  (first body))
+(defn- actual [check]
+  (first check))
 
-(defn- expected [body]
-  (nth body 2))
+(defn- expected [check]
+  (third check))
 
 (defn- evaluate [expr]
   (eval expr))
