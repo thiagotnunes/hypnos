@@ -1,24 +1,16 @@
 (ns oizys.core)
 
-(defn- split-at-checker [body]
-  (split-at 1 body))
+(defn- split-checks [body]
+  (partition 3 body))
 
 (defn- actual [body]
-  (->> body
-       split-at-checker
-       first))
+  (first body))
 
 (defn- expected [body]
-  (->> body
-       split-at-checker
-       second
-       (drop 1)))
+  (nth body 2))
 
-(defn- evaluate [full-expr]
-  (let [expr (first full-expr)]
-    (if (coll? expr)
-      (eval expr)
-      expr)))
+(defn- evaluate [expr]
+  (eval expr))
 
 (defn- check [actual expected]
   (let [evaluated-actual (evaluate actual)
@@ -28,6 +20,6 @@
       (throw (AssertionError. (str (first actual) " != " (first expected)))))))
 
 (defmacro fact [description & body]
-  (let [actual# (actual body)
-        expected# (expected body)]
-    (check actual# expected#)))
+  (let [checks# (split-checks body)]
+    (doseq [check# checks#]
+      (check (actual check#) (expected check#)))))
