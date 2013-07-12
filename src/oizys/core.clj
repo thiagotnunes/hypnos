@@ -14,12 +14,20 @@
        second
        (drop 1)))
 
+(defn- evaluate [full-expr]
+  (let [expr (first full-expr)]
+    (if (coll? expr)
+      (eval expr)
+      expr)))
+
 (defn- check [actual expected]
-  (if (= actual expected)
-    true
-    (throw (AssertionError. (str (first actual) " != " (first expected))))))
+  (let [evaluated-actual (evaluate actual)
+        evaluated-expected (evaluate expected)]
+    (if (= evaluated-actual evaluated-expected)
+      true
+      (throw (AssertionError. (str (first actual) " != " (first expected)))))))
 
 (defmacro fact [description & body]
-  (let [actual (actual body)
-        expected (expected body)]
-    (check actual expected)))
+  (let [actual# (actual body)
+        expected# (expected body)]
+    (check actual# expected#)))

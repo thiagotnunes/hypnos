@@ -2,8 +2,11 @@
   (:require
    [oizys.core :refer :all]))
 
-(fact "this should pass"
+(fact "1 should be 1"
       1 => 1)
 
-(fact "this should fail"
-      1 => 2)
+(fact "1 + 1 should be 2"
+      (+ 1 1) => 2)
+
+(fact "2 should be 1 + 1"
+      2 => (+ 1 1))
