@@ -8,6 +8,10 @@
 (fact "simple expression test"
       (+ 1 1) => 2)
 
+(fact "multiple assertions test"
+      (+ 1 1) => 2
+      2 => (+ 1 1))
+
 (fact "nested expressions test"
       (let [a 1
             b 2]

@@ -4,13 +4,9 @@
 
 (def checkers {'=> (var equality-checker)})
 
-(defn- present? [element coll]
-  (when (coll? coll)
-        (some #{element} coll)))
-
 (defn check [actual expected checker-fn]
-  (let [evaluated-actual (evaluate actual)
-        evaluated-expected (evaluate expected)]
+  (let [evaluated-actual (eval actual)
+        evaluated-expected (eval expected)]
     (if (checker-fn evaluated-actual evaluated-expected)
       true
       (throw (AssertionError. (str "Expected " actual " = " expected))))))
@@ -24,44 +20,27 @@
         function-name (:name fn-meta)]
     (symbol (str namespace-name "/" function-name))))
 
-(defn- parse-expression [body]
-  (let [index-of-checker (.indexOf body '=>)
-        check-start-position (- index-of-checker 1)]
-    (split-at check-start-position body)))
-
-(defn- statements [parsed-expression]
-  (->> parsed-expression
-       second
-       (remove #{'=>})
-       (into [])))
-
-(defn- checker [parsed-expression]
-  (->> parsed-expression
-       second
-       second))
-
-(defn- context [parsed-expression]
-  (->> parsed-expression
-       first))
-
 (defn- checker-symbol-for [checker]
   (-> checker
       checkers
       ->symbol))
 
-(defn- resolve-expression [expression]
-  (if (present? '=> expression)
-    (let [parsed-expression (parse-expression expression)
-          context (context parsed-expression)
-          checker (checker parsed-expression)
-          statements (statements parsed-expression)
-          checker-args (conj statements (checker-symbol-for checker))]
-      (concat context [(list 'apply (->symbol (var check)) checker-args)]))
-    expression))
+(defn- context [parsed-expression]
+  [(first parsed-expression)
+   (nth parsed-expression 2)
+   (checker-symbol-for (second parsed-expression))])
 
 (defn- resolve-fact [body]
-  (let [result (resolve-expression body)]
-    (map resolve-expression result)))
+  (if (not (empty? body))
+    (let [head (first body)
+          checker (second body)]
+      (if (= checker '=>)
+        (let [expression (take 3 body)
+              context (context expression)
+              check-fn (->symbol (var check))]
+          (concat [(list 'apply check-fn context)] (resolve-fact (drop 3 body))))
+        (concat [head] (resolve-fact (rest body)))))
+    []))
 
 (defmacro fact [description & body]
-  (first (resolve-fact body)))
+  (conj (resolve-fact body) 'and))
