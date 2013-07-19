@@ -5,7 +5,10 @@
 
 (declare parse-expressions)
 
-(defn- parse-checker-expression [[head checker tail]]
+(defn- has-assertion? [expressions]
+  ((second expressions) checker/checkers))
+
+(defn- parse-assertion [[head checker tail]]
   (let [check-fn (function/fn->symbol (var checker/check))]
     (list 'apply check-fn [head tail (checker/symbol-for checker)])))
 
@@ -21,10 +24,9 @@
   (if (seq body)
     (let [head (parse-head body)
           tail (rest body)
-          expressions (cons head tail)
-          checker (second expressions)]
-      (if (= checker '=>)
-        (cons (parse-checker-expression (take 3 expressions))
+          expressions (cons head tail)]
+      (if (has-assertion? expressions)
+        (cons (parse-assertion (take 3 expressions))
               (parse-expressions (drop 3 expressions)))
         (cons head (parse-tail expressions))))
     ()))
