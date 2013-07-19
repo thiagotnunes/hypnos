@@ -4,6 +4,9 @@
 
 (def checkers {'=> (var equality-checker)})
 
+(defn- third [coll]
+  (nth coll 2))
+
 (defn check [actual expected checker-fn]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
@@ -27,20 +30,27 @@
 
 (defn- context [parsed-expression]
   [(first parsed-expression)
-   (nth parsed-expression 2)
+   (third parsed-expression)
    (checker-symbol-for (second parsed-expression))])
 
-(defn- resolve-fact [body]
+(defn- parse-expressions [body]
   (if (not (empty? body))
     (let [head (first body)
-          checker (second body)]
+          parsed-body (if (list? head)
+                        (concat [(resolve-expression head)] (rest body))
+                        body)
+          head (first parsed-body)
+          checker (second parsed-body)]
       (if (= checker '=>)
-        (let [expression (take 3 body)
+        (let [expression (take 3 parsed-body)
               context (context expression)
               check-fn (->symbol (var check))]
-          (concat [(list 'apply check-fn context)] (resolve-fact (drop 3 body))))
-        (concat [head] (resolve-fact (rest body)))))
+          (concat [(list 'apply check-fn context)] (parse-expressions (drop 3 parsed-body))))
+        (concat [head] (parse-expressions (rest parsed-body)))))
     []))
 
+(defn- parse-fact [body]
+  (conj (parse-expressions body) 'do))
+
 (defmacro fact [description & body]
-  (conj (resolve-fact body) 'and))
+  (parse-fact body))
