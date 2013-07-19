@@ -6,7 +6,7 @@
 (declare parse-expressions)
 
 (defn- has-assertion? [expressions]
-  ((second expressions) checker/checkers))
+  (checker/checkers (second expressions)))
 
 (defn- parse-assertion [[head checker tail]]
   (let [check-fn (function/fn->symbol (var checker/check))]

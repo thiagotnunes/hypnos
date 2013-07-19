@@ -8,7 +8,7 @@
 (fact "simple expression test"
       (+ 1 1) => 2)
 
-(fact o"multiple assertions test"
+(fact "multiple assertions test"
       (+ 1 1) => 2
       2 => (+ 1 1))
 
