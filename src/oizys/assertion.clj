@@ -6,10 +6,10 @@
 
 (def assertions {'=> (var equality-assertion)})
 
-(defn assert [actual expected checker-fn]
+(defn assert [actual expected assertion-fn]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
-    (if (checker-fn evaluated-actual evaluated-expected)
+    (if (assertion-fn evaluated-actual evaluated-expected)
       true
       (throw (AssertionError. (str "Expected " actual " = " expected))))))
 
