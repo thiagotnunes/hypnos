@@ -8,7 +8,7 @@
 (fact "simple expression test"
       (+ 1 1) => 2)
 
-(fact "multiple assertions test"
+(fact o"multiple assertions test"
       (+ 1 1) => 2
       2 => (+ 1 1))
 
@@ -16,6 +16,3 @@
       (let [a 1
             b 2]
         (+ a a) => b))
-
-; ((let [a 1 b 2] (+ a a) => b))
-; (eval (let [a 1 b 2] (check (+ a a) b))
