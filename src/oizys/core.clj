@@ -1,6 +1,8 @@
 (ns oizys.core)
 
-(declare equality-checker)
+(declare equality-checker
+         parse-head
+         parse-expressions)
 
 (def checkers {'=> (var equality-checker)})
 
@@ -33,12 +35,16 @@
    (third parsed-expression)
    (checker-symbol-for (second parsed-expression))])
 
+(defn- parse-head [body]
+  (let [head (first body)
+        tail (rest body)]
+    (if (list? head)
+      (concat [(parse-expressions head)] tail)
+      body)))
+
 (defn- parse-expressions [body]
-  (if (not (empty? body))
-    (let [head (first body)
-          parsed-body (if (list? head)
-                        (concat [(resolve-expression head)] (rest body))
-                        body)
+  (if (seq body)
+    (let [parsed-body (parse-head body)
           head (first parsed-body)
           checker (second parsed-body)]
       (if (= checker '=>)
