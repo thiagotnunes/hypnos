@@ -1,7 +1,6 @@
 (ns oizys.core)
 
 (declare equality-checker
-         parse-head
          parse-expressions)
 
 (def checkers {'=> (var equality-checker)})
@@ -19,7 +18,7 @@
 (defn equality-checker [actual expected]
   (= actual expected))
 
-(defn ->symbol [fn-var]
+(defn fn->symbol [fn-var]
   (let [fn-meta (meta fn-var)
         namespace-name (-> fn-meta :ns ns-name)
         function-name (:name fn-meta)]
@@ -28,35 +27,34 @@
 (defn- checker-symbol-for [checker]
   (-> checker
       checkers
-      ->symbol))
+      fn->symbol))
 
-(defn- context [parsed-expression]
-  [(first parsed-expression)
-   (third parsed-expression)
-   (checker-symbol-for (second parsed-expression))])
+(defn- parse-checker-expression [[head checker tail]]
+  (let [check-fn (fn->symbol (var check))]
+    (list 'apply check-fn [head tail (checker-symbol-for checker)])))
 
-(defn- parse-head [body]
-  (let [head (first body)
-        tail (rest body)]
-    (if (list? head)
-      (concat [(parse-expressions head)] tail)
-      body)))
+(defn- parse-head [[head & _]]
+  (if (list? head)
+    (parse-expressions head)
+    head))
+
+(defn- parse-tail [[_ & tail]]
+  (parse-expressions tail))
 
 (defn- parse-expressions [body]
   (if (seq body)
-    (let [parsed-body (parse-head body)
-          head (first parsed-body)
-          checker (second parsed-body)]
+    (let [head (parse-head body)
+          tail (rest body)
+          expressions (cons head tail)
+          checker (second expressions)]
       (if (= checker '=>)
-        (let [expression (take 3 parsed-body)
-              context (context expression)
-              check-fn (->symbol (var check))]
-          (concat [(list 'apply check-fn context)] (parse-expressions (drop 3 parsed-body))))
-        (concat [head] (parse-expressions (rest parsed-body)))))
+        (cons (parse-checker-expression (take 3 expressions))
+                (parse-expressions (drop 3 expressions)))
+        (cons head (parse-tail expressions))))
     []))
 
 (defn- parse-fact [body]
-  (conj (parse-expressions body) 'do))
+  (cons 'do (parse-expressions body)))
 
 (defmacro fact [description & body]
   (parse-fact body))
