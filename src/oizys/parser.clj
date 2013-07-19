@@ -1,16 +1,16 @@
 (ns oizys.parser
   (:require
-   [oizys.function :as function]
-   [oizys.checker  :as checker]))
+   [oizys.function  :as function]
+   [oizys.assertion :as assertion]))
 
 (declare parse-expressions)
 
 (defn- has-assertion? [expressions]
-  (checker/checkers (second expressions)))
+  (assertion/assertions (second expressions)))
 
-(defn- parse-assertion [[head checker tail]]
-  (let [check-fn (function/fn->symbol (var checker/check))]
-    (list 'apply check-fn [head tail (checker/symbol-for checker)])))
+(defn- parse-assertion [[head assertion tail]]
+  (let [assertion-fn (function/fn->symbol (var assertion/assert))]
+    (list 'apply assertion-fn [head tail (assertion/symbol-for assertion)])))
 
 (defn- parse-head [[head & _]]
   (if (list? head)

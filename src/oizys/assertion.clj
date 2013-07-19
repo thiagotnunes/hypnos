@@ -1,22 +1,22 @@
-(ns oizys.checker
+(ns oizys.assertion
   (:require
    [oizys.function :as function]))
 
-(declare equality-checker)
+(declare equality-assertion)
 
-(def checkers {'=> (var equality-checker)})
+(def assertions {'=> (var equality-assertion)})
 
-(defn check [actual expected checker-fn]
+(defn assert [actual expected checker-fn]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
     (if (checker-fn evaluated-actual evaluated-expected)
       true
       (throw (AssertionError. (str "Expected " actual " = " expected))))))
 
-(defn equality-checker [actual expected]
+(defn equality-assertion [actual expected]
   (= actual expected))
 
-(defn symbol-for [checker]
-  (-> checker
-      checkers
+(defn symbol-for [assertion]
+  (-> assertion
+      assertions
       function/fn->symbol))
