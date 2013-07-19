@@ -27,7 +27,7 @@
         (cons (parse-checker-expression (take 3 expressions))
               (parse-expressions (drop 3 expressions)))
         (cons head (parse-tail expressions))))
-    []))
+    ()))
 
 (defn parse-fact [body]
   (cons 'do (parse-expressions body)))
