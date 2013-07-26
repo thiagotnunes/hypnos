@@ -36,39 +36,36 @@
       meta
       :line))
 
-(defn- has-assertion? [expressions]
-  (assertions (second expressions)))
+(defn- parse-assertion [form]
+  (let [assertion-fn (fn->symbol #'assertion)
+        actual (-> form zip/left zip/node)
+        assertion (zip/node form)
+        expected (-> form zip/right zip/node)
+        form-without-actual-expected (-> form
+                                         zip/left
+                                         zip/remove
+                                         zip/next
+                                         zip/right
+                                         zip/remove)]
+    (zip/remove
+     (zip/insert-left form-without-actual-expected `(apply ~assertion-fn ~[actual
+                                                                           expected
+                                                                           (symbol-for assertion)
+                                                                           (line-for assertion)])))))
 
-(defn- parse-assertion [[actual assertion expected]]
-  (let [assertion-fn (fn->symbol #'assertion)]
-    `(apply ~assertion-fn ~[actual
-                            expected
-                            (symbol-for assertion)
-                            (line-for assertion)])))
-
-(defn- parse-head [[head & _]]
-  (if (seq? head)
-    (parse-expressions head)
-    head))
-
-(defn- parse-tail [[_ & tail]]
-  (parse-expressions tail))
-
-(defn- parse-expressions [body]
-  (if (seq body)
-    (let [head (parse-head body)
-          tail (rest body)
-          expressions (cons head tail)]
-      (if (has-assertion? expressions)
-        (cons (parse-assertion (take 3 expressions))
-              (parse-expressions (drop 3 expressions)))
-        (cons head (parse-tail expressions))))
-    ()))
+(defn- parse-expressions [form]
+  (if (zip/end? form)
+    form
+    (if (assertions (zip/node form))
+      (recur (parse-assertion form))
+      (recur (zip/next form)))))
 
 (defn- parse-fact [body]
-  (->> body
-       (parse-expressions)
-       (concat '(do))))
+  (-> body
+      zip/seq-zip
+      parse-expressions
+      zip/root
+      (conj 'do)))
 
 
 
