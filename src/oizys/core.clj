@@ -1,7 +1,8 @@
 (ns oizys.core
   (:require
-   [clojure.zip :as zip]
-   [clojure.algo.monads :refer [domonad maybe-m]]))
+   [clojure.zip         :as zip]
+   [clojure.algo.monads :refer [domonad maybe-m]]
+   [slingshot.slingshot :refer [throw+]]))
 
 (declare parse-expressions)
 (declare expected-assertion)
@@ -14,12 +15,14 @@
 
 (def assertions {'=> #'expected-assertion})
 
-(defn assertion [actual expected assertion-fn]
+(defn assertion [actual expected assertion-fn line]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
     (if (assertion-fn evaluated-actual evaluated-expected)
       true
-      (throw (AssertionError. (str "Expected " actual " = " expected))))))
+      (throw+ {:actual actual
+               :expected expected
+               :line line}))))
 
 (defn expected-assertion [actual expected]
   (= actual expected))
@@ -29,12 +32,20 @@
       assertions
       fn->symbol))
 
+(defn line-for [assertion]
+  (-> assertion
+      meta
+      :line))
+
 (defn- has-assertion? [expressions]
   (assertions (second expressions)))
 
 (defn- parse-assertion [[actual assertion expected]]
   (let [assertion-fn (fn->symbol #'assertion)]
-    (list 'apply assertion-fn [actual expected (symbol-for assertion)])))
+    (list 'apply assertion-fn [actual
+                               expected
+                               (symbol-for assertion)
+                               (line-for assertion)])))
 
 (defn- parse-head [[head & _]]
   (if (seq? head)
@@ -93,6 +104,8 @@
   (let [base-line (or (-> form meta :line) 1)
         form-zipper (zip/seq-zip form)]
     (annotate-assertion (zip/next form-zipper) base-line)))
+
+
 
 (defmacro fact [& _]
   (->> &form
