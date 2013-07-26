@@ -18,11 +18,10 @@
 (defn assertion [actual expected assertion-fn line]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
-    (if (assertion-fn evaluated-actual evaluated-expected)
-      true
-      (throw+ {:actual actual
-               :expected expected
-               :line line}))))
+    (when-not (assertion-fn evaluated-actual evaluated-expected)
+      {:actual actual
+       :expected expected
+       :line line})))
 
 (defn expected-assertion [actual expected]
   (= actual expected))
@@ -42,10 +41,10 @@
 
 (defn- parse-assertion [[actual assertion expected]]
   (let [assertion-fn (fn->symbol #'assertion)]
-    (list 'apply assertion-fn [actual
-                               expected
-                               (symbol-for assertion)
-                               (line-for assertion)])))
+    `(apply ~assertion-fn ~[actual
+                            expected
+                            (symbol-for assertion)
+                            (line-for assertion)])))
 
 (defn- parse-head [[head & _]]
   (if (seq? head)
@@ -67,7 +66,9 @@
     ()))
 
 (defn- parse-fact [body]
-  (cons 'do (parse-expressions body)))
+  (->> body
+       (parse-expressions)
+       (concat '(do))))
 
 
 
