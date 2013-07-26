@@ -91,15 +91,16 @@
       (previous-line assertion-position)
       base-line))
 
+(defn add-line-to-assertion [form base-line]
+  (let [node (zip/node form)]
+    (with-meta node {:line (guess-line form base-line)})))
+
 (defn annotate-assertion [form base-line]
   (if (zip/end? form)
     (zip/root form)
-    (do
-      (let [node (zip/node form)]
-        (if (assertions node)
-          (let [assertion (with-meta node {:line (guess-line form base-line)})]
-            (recur (-> form (zip/replace assertion) zip/next) (inc base-line)))
-          (recur (zip/next form) base-line))))))
+    (if (assertions (zip/node form))
+      (recur (-> form (zip/replace (add-line-to-assertion form base-line)) zip/next) (inc base-line))
+      (recur (zip/next form) base-line))))
 
 (defn annotate-assertions [form]
   (let [base-line (or (-> form meta :line) 1)
