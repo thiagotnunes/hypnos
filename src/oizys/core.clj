@@ -7,15 +7,9 @@
 (declare parse-expressions)
 (declare expected-assertion)
 
-(defn- fn->symbol [fn-var]
-  (let [fn-meta (meta fn-var)
-        namespace-name (-> fn-meta :ns ns-name)
-        function-name (:name fn-meta)]
-    (symbol (str namespace-name "/" function-name))))
-
 (def assertions {'=> #'expected-assertion})
 
-(defn assertion [actual expected assertion-fn line]
+(defn confirm [actual expected assertion-fn line]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
     (when-not (assertion-fn evaluated-actual evaluated-expected)
@@ -26,32 +20,30 @@
 (defn expected-assertion [actual expected]
   (= actual expected))
 
-(defn- symbol-for [assertion]
-  (-> assertion
-      assertions
-      fn->symbol))
-
 (defn line-for [assertion]
   (-> assertion
       meta
       :line))
 
+(defn- remove-left [form]
+  (-> form zip/left zip/remove))
+
+(defn- remove-right [form]
+  (-> form zip/right zip/remove))
+
 (defn- parse-assertion [form]
-  (let [assertion-fn (fn->symbol #'assertion)
-        actual (-> form zip/left zip/node)
-        assertion (zip/node form)
-        expected (-> form zip/right zip/node)
-        form-without-actual-expected (-> form
-                                         zip/left
-                                         zip/remove
-                                         zip/next
-                                         zip/right
-                                         zip/remove)]
-    (zip/remove
-     (zip/insert-left form-without-actual-expected `(apply ~assertion-fn ~[actual
-                                                                           expected
-                                                                           (symbol-for assertion)
-                                                                           (line-for assertion)])))))
+  (let [actual (-> form zip/left zip/node)
+        assertion-symbol (zip/node form)
+        expected (-> form zip/right zip/node)]
+    (-> form
+        remove-left
+        zip/next
+        remove-right
+        (zip/insert-left `(apply ~#'confirm ~[actual
+                                              expected
+                                              (assertions assertion-symbol)
+                                              (line-for assertion-symbol)]))
+        zip/remove)))
 
 (defn- parse-expressions [form]
   (if (zip/end? form)
