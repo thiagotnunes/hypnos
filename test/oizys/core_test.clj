@@ -1,7 +1,7 @@
 (ns oizys.core-test
   (:require
-   [oizys.core               :refer :all]
-   [oizys.support.calculator :as calculator]))
+   [oizys.core         :refer :all]
+   [support.calculator :as calculator]))
 
 (facts "simple tests"
        (fact "simple equality test"

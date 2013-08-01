@@ -1,4 +1,4 @@
-(ns oizys.support.calculator)
+(ns support.calculator)
 
 (defn plus [& args]
   (reduce + args))

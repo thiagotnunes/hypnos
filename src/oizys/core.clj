@@ -6,6 +6,18 @@
 
 (declare parse-expressions)
 
+(defn- traverse [form pred func]
+  (letfn [(traverse-form [form]
+            (if (zip/end? form)
+              form
+              (if (pred (zip/node form))
+                (recur (func form))
+                (recur (zip/next form)))))]
+    (-> form
+        zip/seq-zip
+        traverse-form
+        zip/root)))
+
 (defn line-for [assertion]
   (-> assertion
       meta
@@ -29,34 +41,37 @@
                                                                    expected
                                                                    (assertion/assertions assertion-symbol)
                                                                    (line-for assertion-symbol)])
-                           {:oizys-assertion :converted-to-function}))
+                           {:oizys-assertion true}))
         zip/remove)))
 
-(defn- parse-assertions [form]
-  (if (zip/end? form)
-    form
-    (if (assertion/assertions (zip/node form))
-      (recur (assertion->function form))
-      (recur (zip/next form)))))
-
-(defn- assertions->functions [body]
-  (-> body
-      zip/seq-zip
-      parse-assertions
-      zip/root))
+(defn- assertions->functions [form]
+  (traverse form
+            assertion/assertions
+            assertion->function))
 
 (defn- remove-description [body]
   (drop 2 body))
 
-(defn- wrap [body]
-  `(do ~@body))
+(defn- assertion->with-error-handling [form errors]
+  (let [assertion (zip/node form)]
+    (-> form
+        (zip/insert-left (with-meta `(swap! ~errors conj ~assertion)
+                           {:oizys-assertion-error-handling true}))
+        zip/remove)))
+
+(defn- assertions->with-error-handling [form]
+  (let [errors (gensym "errors__")]
+    `(let [~errors (atom [])]
+       ~@(traverse form
+                   #(-> % meta :oizys-assertion)
+                   #(assertion->with-error-handling % errors)))))
 
 (defmacro fact [& _]
   (-> &form
       remove-description
       position/add-line-number-to-assertions
       assertions->functions
-      wrap))
+      assertions->with-error-handling))
 
 (defmacro facts [& body]
   `(do ~@(drop 2 &form)))
