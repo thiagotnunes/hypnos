@@ -39,11 +39,10 @@
       (recur (zip/next form)))))
 
 (defn- parse-fact [body]
-  (-> body
-      zip/seq-zip
-      parse-expressions
-      zip/root
-      (conj 'do)))
+  `(do ~@(-> body
+             zip/seq-zip
+             parse-expressions
+             zip/root)))
 
 
 (defmacro fact [& _]
