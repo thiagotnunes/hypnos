@@ -4,8 +4,6 @@
    [oizys.assertion     :as assertion]
    [clojure.zip         :as zip]))
 
-(declare parse-expressions)
-
 (defn- traverse [form pred func]
   (letfn [(traverse-form [form]
             (if (zip/end? form)
