@@ -4,14 +4,17 @@
    [oizys.form          :as form]
    [clojure.zip         :as zip]))
 
-(defn- remove-description [body]
-  (drop 2 body))
+(defn- fact-description [form]
+  (second form))
+
+(defn- fact-body [form]
+  (drop 2 form))
 
 (defmacro fact [& _]
-  (let [description (second &form)]
-    (->> &form
-         remove-description
-         position/add-line-number-to-assertions
+  (let [description (fact-description &form)
+        fact-body (fact-body &form)]
+    (->> fact-body
+         position/annotate-assertions
          form/assertions->functions
          (form/assertions->with-error-handling description))))
 

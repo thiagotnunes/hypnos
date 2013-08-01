@@ -23,18 +23,26 @@
       (previous-line assertion-position)
       base-line))
 
-(defn- add-line-to-assertion [form base-line]
-  (let [node (zip/node form)]
-    (with-meta node {:line (guess-line form base-line)})))
+(defn- add-line-number [assertion line]
+  (with-meta assertion {:line line}))
+
+(defn- add-filename [assertion]
+  (vary-meta assertion assoc :filename "file"))
 
 (defn- annotate-assertion [form base-line]
+  (let [guessed-line (guess-line form base-line)]
+    (-> form
+        zip/node
+        (add-line-number guessed-line)
+        add-filename)))
+
+(defn- traverse [form base-line]
   (if (zip/end? form)
     (zip/root form)
     (if (assertion/assertions (zip/node form))
-      (recur (-> form (zip/replace (add-line-to-assertion form base-line)) zip/next) (inc base-line))
+      (recur (zip/next (zip/replace form (annotate-assertion form base-line))) (inc base-line))
       (recur (zip/next form) base-line))))
 
-(defn add-line-number-to-assertions [form]
-  (let [base-line (or (-> form meta :line) 1)
-        form-zipper (zip/seq-zip form)]
-    (annotate-assertion (zip/next form-zipper) base-line)))
+(defn annotate-assertions [form]
+  (let [base-line (or (-> form meta :line) 1)]
+    (traverse (zip/seq-zip form) base-line)))

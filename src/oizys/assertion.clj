@@ -4,7 +4,7 @@
 
 (def assertions {'=> #'expected-assertion})
 
-(defn confirm [actual expected assertion-fn line]
+(defn confirm [actual expected assertion-fn metadata]
   (let [evaluated-actual (eval actual)
         evaluated-expected (eval expected)]
     (let [assertion-result (assertion-fn evaluated-actual evaluated-expected)]
@@ -12,7 +12,8 @@
         {:message (:message assertion-result)
          :actual actual
          :expected expected
-         :line line}))))
+         :line (:line metadata)
+         :filename (:filename metadata)}))))
 
 (defn expected-assertion [actual expected]
   {:success (= actual expected)

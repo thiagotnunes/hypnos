@@ -16,11 +16,6 @@
         traverse-form
         zip/root)))
 
-(defn- line-for [assertion]
-  (-> assertion
-      meta
-      :line))
-
 (defn- remove-left [form]
   (-> form zip/left zip/remove))
 
@@ -38,7 +33,7 @@
         (zip/insert-left (with-meta `(apply ~#'assertion/confirm ~[actual
                                                                    expected
                                                                    (assertion/assertions assertion-symbol)
-                                                                   (line-for assertion-symbol)])
+                                                                   (meta assertion-symbol)])
                            {:oizys-assertion true}))
         zip/remove)))
 
