@@ -34,7 +34,7 @@
       (recur (-> form (zip/replace (add-line-to-assertion form base-line)) zip/next) (inc base-line))
       (recur (zip/next form) base-line))))
 
-(defn annotate-assertions [form]
+(defn add-line-number-to-assertions [form]
   (let [base-line (or (-> form meta :line) 1)
         form-zipper (zip/seq-zip form)]
     (annotate-assertion (zip/next form-zipper) base-line)))

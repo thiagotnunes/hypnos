@@ -17,7 +17,7 @@
 (defn- remove-right [form]
   (-> form zip/right zip/remove))
 
-(defn- parse-assertion [form]
+(defn- assertion->function [form]
   (let [actual (-> form zip/left zip/node)
         assertion-symbol (zip/node form)
         expected (-> form zip/right zip/node)]
@@ -25,31 +25,38 @@
         remove-left
         zip/next
         remove-right
-        (zip/insert-left `(apply ~#'confirm ~[actual
-                                              expected
-                                              (assertion/assertions assertion-symbol)
-                                              (line-for assertion-symbol)]))
+        (zip/insert-left (with-meta `(apply ~#'assertion/confirm ~[actual
+                                                                   expected
+                                                                   (assertion/assertions assertion-symbol)
+                                                                   (line-for assertion-symbol)])
+                           {:oizys-assertion :converted-to-function}))
         zip/remove)))
 
-(defn- parse-expressions [form]
+(defn- parse-assertions [form]
   (if (zip/end? form)
     form
-    (if (assertions (zip/node form))
-      (recur (parse-assertion form))
+    (if (assertion/assertions (zip/node form))
+      (recur (assertion->function form))
       (recur (zip/next form)))))
 
-(defn- parse-fact [body]
-  `(do ~@(-> body
-             zip/seq-zip
-             parse-expressions
-             zip/root)))
+(defn- assertions->functions [body]
+  (-> body
+      zip/seq-zip
+      parse-assertions
+      zip/root))
 
+(defn- remove-description [body]
+  (drop 2 body))
+
+(defn- wrap [body]
+  `(do ~@body))
 
 (defmacro fact [& _]
-  (->> &form
-       annotate-assertions
-       (drop 2)
-       parse-fact))
+  (-> &form
+      remove-description
+      position/add-line-number-to-assertions
+      assertions->functions
+      wrap))
 
 (defmacro facts [& body]
   `(do ~@(drop 2 &form)))
