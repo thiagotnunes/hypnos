@@ -96,8 +96,6 @@
         form-zipper (zip/seq-zip form)]
     (annotate-assertion (zip/next form-zipper) base-line)))
 
-
-
 (defmacro fact [& _]
   (->> &form
        annotate-assertions
