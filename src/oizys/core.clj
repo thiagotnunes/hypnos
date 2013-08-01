@@ -101,3 +101,6 @@
        annotate-assertions
        (drop 2)
        parse-fact))
+
+(defmacro facts [& body]
+  `(do ~@(drop 2 &form)))
