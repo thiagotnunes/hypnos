@@ -1,8 +1,8 @@
 (ns oizys.core
   (:require
-   [oizys.line-position :as position]
-   [oizys.form          :as form]
-   [clojure.zip         :as zip]))
+   [oizys.meta  :as meta]
+   [oizys.form  :as form]
+   [clojure.zip :as zip]))
 
 (defn- fact-description [form]
   (second form))
@@ -14,7 +14,7 @@
   (let [description (fact-description &form)
         fact-body (fact-body &form)]
     (->> fact-body
-         position/annotate-assertions
+         meta/annotate-assertions
          form/assertions->functions
          (form/assertions->with-error-handling description))))
 

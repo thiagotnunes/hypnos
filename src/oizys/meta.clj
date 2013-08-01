@@ -1,4 +1,4 @@
-(ns oizys.line-position
+(ns oizys.meta
   (:require
    [oizys.assertion     :as assertion]
    [clojure.zip         :as zip]
