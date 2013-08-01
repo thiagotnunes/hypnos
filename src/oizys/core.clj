@@ -8,11 +8,12 @@
   (drop 2 body))
 
 (defmacro fact [& _]
-  (-> &form
-      remove-description
-      position/add-line-number-to-assertions
-      form/assertions->functions
-      form/assertions->with-error-handling))
+  (let [description (second &form)]
+    (->> &form
+         remove-description
+         position/add-line-number-to-assertions
+         form/assertions->functions
+         (form/assertions->with-error-handling description))))
 
 (defmacro facts [& body]
   `(do ~@(drop 2 &form)))
