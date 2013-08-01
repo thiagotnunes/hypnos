@@ -2,11 +2,11 @@
   (:require
    [colorize.core :as color]))
 
-(defn- print-failure [description {filename :filename line :line message :message}]
+(defn- print-failure [description {namespace :namespace line :line message :message}]
   (printf "%s \"%s\" at (%s:%d)\n%s\n\n"
           (color/red "FAIL:")
           description
-          filename
+          namespace
           line
           message))
 

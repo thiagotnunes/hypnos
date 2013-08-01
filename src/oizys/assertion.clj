@@ -13,7 +13,7 @@
          :actual actual
          :expected expected
          :line (:line metadata)
-         :filename (:filename metadata)}))))
+         :namespace (ns-name *ns*)}))))
 
 (defn expected-assertion [actual expected]
   {:success (= actual expected)
