@@ -35,4 +35,4 @@
 (facts "test"
        (facts "nested"
               (fact "statement"
-                    (+ 1 1) => 2)))
+                    1 => 1)))

@@ -5,12 +5,12 @@
 
 (defn- format-description [description]
   (if (map? description)
-    (string/join " - " (conj (:scoping description) (:description description)))
+    (string/join " - " (conj (:nesting description) (:name description)))
     description))
 
-(defn- print-failure [description {namespace :namespace
-                                   line :line
-                                   expression :expression}]
+(defn- print-failure [{namespace :namespace
+                       line :line
+                       expression :expression}]
   (printf (color/white "\tExpected: %s\n")
           expression)
   (printf (color/white "\tat %s:%d\n")
@@ -22,9 +22,8 @@
                     deref
                     (remove nil?)
                     seq)]
-    (printf "%s\t\"%s\"\n"
-            (color/red "FAIL: ")
+    (printf (color/red "FAIL: \t\"%s\"\n")
             (format-description description))
     (doseq [error errors]
-      (print-failure description error))
+      (print-failure error))
     (println "")))
