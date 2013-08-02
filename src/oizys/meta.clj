@@ -14,8 +14,10 @@
   (domonad maybe-m
            [prev (zip/prev position)
             left (zip/left prev)
-            node (zip/node left)]
-           (-> node meta :line)))
+            node (zip/node left)
+            meta (meta node)
+            line (:line meta)]
+           (inc line)))
 
 (defn- guess-line [assertion-position base-line]
   (or (left-line assertion-position)
