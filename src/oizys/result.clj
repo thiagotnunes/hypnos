@@ -1,6 +1,12 @@
 (ns oizys.result
   (:require
-   [colorize.core :as color]))
+   [colorize.core  :as color]
+   [clojure.string :as string]))
+
+(defn- format-description [description]
+  (if (map? description)
+    (string/join " - " (conj (:scoping description) (:description description)))
+    description))
 
 (defn- print-failure [description {namespace :namespace
                                    line :line
@@ -18,7 +24,7 @@
                     seq)]
     (printf "%s\t\"%s\"\n"
             (color/red "FAIL: ")
-            description)
+            (format-description description))
     (doseq [error errors]
       (print-failure description error))
     (println "")))
