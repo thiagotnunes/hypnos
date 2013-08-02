@@ -1,7 +1,6 @@
 (ns oizys.form
   (:require
    [oizys.assertion :as assertion]
-   [oizys.result    :as result]
    [clojure.zip     :as zip]))
 
 (defn- traverse [form pred func]
@@ -44,13 +43,13 @@
                            {:oizys-assertion-error-handling true}))
         zip/remove)))
 
-(defn assertions->with-error-handling [description form]
+(defn assertions->with-error-handling [description result-fn form]
   (let [assertion-results (gensym "assertion_results__")]
     `(let [~assertion-results (atom [])]
        ~@(traverse form
                    #(-> % meta :oizys-assertion)
                    #(assertion->with-error-handling % assertion-results))
-       (result/to-stdout ~description ~assertion-results))))
+       (~result-fn ~description ~assertion-results))))
 
 (defn assertions->functions [form]
   (traverse form
