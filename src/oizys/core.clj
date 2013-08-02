@@ -3,6 +3,7 @@
    [oizys.meta   :as meta]
    [oizys.form   :as form]
    [oizys.result :as result]
+   [oizys.zip    :as ozip]
    [clojure.zip  :as zip]))
 
 (defn- description-from [form]
@@ -19,7 +20,7 @@
          form/assertions->functions
          (form/assertions->with-error-handling description result/to-stdout))))
 
-(defn- add-description [form description]
+(defn- add-description [description form]
   (let [original-description (-> form zip/right zip/node)]
     (if (map? original-description)
         (let [scope (:scoping original-description)]
@@ -27,17 +28,9 @@
         (-> form zip/next zip/remove (zip/insert-right {:description original-description
                                                         :scoping [description]})))))
 
-(defn- traverse [form description]
-  (if (zip/end? form)
-    form
-    (if (#{'fact} (zip/node form))
-      (recur (zip/next (add-description form description)) description)
-      (recur (zip/next form) description))))
-
 (defmacro facts [& _]
   (let [description (description-from &form)
         body (body-from &form)]
     `(do ~@(-> body
-               zip/seq-zip
-               (traverse description)
-               zip/root))))
+               (ozip/traverse #{'fact}
+                              (partial add-description description))))))

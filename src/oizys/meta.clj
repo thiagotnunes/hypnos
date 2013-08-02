@@ -1,28 +1,26 @@
 (ns oizys.meta
   (:require
    [oizys.assertion     :as assertion]
-   [clojure.zip         :as zip]
-   [clojure.algo.monads :refer [domonad maybe-m]]))
+   [oizys.zip           :as ozip]
+   [clojure.zip         :as zip]))
 
-(defn- left-line [position]
-  (-> position zip/left zip/node meta :line))
+(defn- line-number [node]
+  (-> node meta :line))
 
-(defn- right-line [position]
-  (-> position zip/right zip/node meta :line))
+(defn- left-line-number [form]
+  (-> form ozip/left-node line-number))
 
-(defn- previous-line [position]
-  (domonad maybe-m
-           [prev (zip/prev position)
-            left (zip/left prev)
-            node (zip/node left)
-            meta (meta node)
-            line (:line meta)]
-           (inc line)))
+(defn- right-line-number [form]
+  (-> form ozip/right-node line-number))
 
-(defn- guess-line [assertion-position base-line]
-  (or (left-line assertion-position)
-      (right-line assertion-position)
-      (previous-line assertion-position)
+(defn- from-previous-line-number [form]
+  (when-let [previous-line (-> form ozip/previous-node line-number)]
+    (inc previous-line)))
+
+(defn- guess-line [form base-line]
+  (or (left-line-number form)
+      (right-line-number form)
+      (from-previous-line-number form)
       base-line))
 
 (defn- add-line-number [assertion line]
@@ -34,13 +32,8 @@
         zip/node
         (add-line-number guessed-line))))
 
-(defn- annotate-assertions [form base-line]
-  (if (zip/end? form)
-    (zip/root form)
-    (if (assertion/assertions (zip/node form))
-      (recur (zip/next (zip/replace form (annotate-assertion form base-line))) (inc base-line))
-      (recur (zip/next form) base-line))))
-
 (defn annotate [form]
   (let [base-line (or (-> form meta :line) 1)]
-    (annotate-assertions (zip/seq-zip form) base-line)))
+    (ozip/traverse form
+                   assertion/assertions
+                   #(zip/replace % (annotate-assertion % base-line)))))
