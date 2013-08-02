@@ -11,7 +11,7 @@
 
 (fact "multiple assertions test"
       (+ 1 1) => 2
-      2 => (+ 1 1))
+      (+ 1 2) => 3)
 
 (fact "nested expressions test"
       (let [a 1
@@ -21,10 +21,6 @@
 (fact "namespace resolution on actual"
       (calculator/plus 1 1) => 2)
 
-(fact "namespace resolution on expected"
-      2 => (calculator/plus 1 1))
-
-
 (let [a 1
       c 3]
   (let [b 2]
@@ -33,6 +29,9 @@
           1 => 1)))
 
 (facts "test"
-       (facts "nested"
-              (fact "statement"
-                    1 => 1)))
+       (let [x 1]
+         (facts "nested"
+                (let [y 2]                 
+                  (fact "statement"
+                        (let [z 3]
+                          (+ x y) => z))))))
