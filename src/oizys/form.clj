@@ -29,10 +29,10 @@
         remove-left
         zip/next
         remove-right
-        (zip/insert-left (with-meta `(apply ~#'assertion/confirm ~[actual
-                                                                   expected
-                                                                   (assertion/assertions assertion-symbol)
-                                                                   (meta assertion-symbol)])
+        (zip/insert-left (with-meta `(apply ~#'assertion/confirm [~actual
+                                                                  ~expected
+                                                                  '~assertion-symbol
+                                                                  '(~actual ~assertion-symbol ~expected)])
                            {:oizys-assertion true}))
         zip/remove)))
 

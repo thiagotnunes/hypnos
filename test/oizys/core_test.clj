@@ -23,3 +23,11 @@
 
 (fact "namespace resolution on expected"
       2 => (calculator/plus 1 1))
+
+
+(let [a 1
+      c 3]
+  (let [b 2]
+    (fact "testing about scoping"
+          a => (- c b)
+          1 => 1)))

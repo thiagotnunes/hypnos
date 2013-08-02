@@ -2,21 +2,23 @@
   (:require
    [colorize.core :as color]))
 
-(defn- print-failure [description {namespace :namespace line :line message :message}]
-  (printf "%s \"%s\" at (%s:%d)\n%s\n"
-          (color/red "FAIL:")
-          description
+(defn- print-failure [description {namespace :namespace
+                                   line :line
+                                   expression :expression}]
+  (printf (color/white "\tExpected: %s\n")
+          expression)
+  (printf (color/white "\tat %s:%d\n")
           namespace
-          line
-          message))
+          line))
 
 (defn to-stdout [description assertions-result]
-  (let [errors (->> assertions-result
+  (when-let [errors (->> assertions-result
                     deref
                     (remove nil?)
                     seq)]
-    (when errors
-      (println "")
-      (doseq [error errors]
-        (print-failure description error))
-      (println ""))))
+    (printf "%s\t\"%s\"\n"
+            (color/red "FAIL: ")
+            description)
+    (doseq [error errors]
+      (print-failure description error))
+    (println "")))
