@@ -3,12 +3,11 @@
    [oizys.core         :refer :all]
    [support.calculator :as calculator]))
 
-(facts "simple tests"
-       (fact "simple equality test"
-             1 => 1)
+(fact "simple equality test"
+      1 => 1)
 
-       (fact "simple expression test"
-             (+ 1 1) => 2))
+(fact "simple expression test"
+      (+ 1 1) => 2)
 
 (fact "multiple assertions test"
       (+ 1 1) => 2
