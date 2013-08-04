@@ -1,8 +1,8 @@
-(ns oizys.facts
+(ns oizys.parser.facts
   (:require
-   [oizys.zip   :as ozip]
-   [oizys.fact  :as fact]
-   [clojure.zip :as zip]))
+   [oizys.zip         :as ozip]
+   [oizys.parser.fact :as fact]
+   [clojure.zip       :as zip]))
 
 (defn- add-nesting-description [form description]
   (let [position (zip/right form)

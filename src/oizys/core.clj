@@ -1,10 +1,10 @@
 (ns oizys.core
   (:require
-   [oizys.meta   :as meta]
-   [oizys.form   :as form]
-   [oizys.fact   :as fact]
-   [oizys.facts   :as facts]
-   [oizys.result :as result]))
+   [oizys.parser.assertion :as assertion]
+   [oizys.parser.meta      :as meta]
+   [oizys.parser.fact      :as fact]
+   [oizys.parser.facts     :as facts]
+   [oizys.result           :as result]))
 
 (defn- description-from [form]
   (second form))
@@ -13,17 +13,17 @@
   (drop 2 form))
 
 (defmacro fact [& _]
-  (let [form (->> &form
-                  meta/annotate
-                  fact/format-description)
-        description (description-from form)]
-    (->> form
+  (let [formatted-form (-> &form
+                           meta/annotate
+                           fact/format-description)
+        description (description-from formatted-form)]
+    (->> formatted-form
          body
-         form/assertions->functions
-         (form/assertions->with-error-handling description result/to-stdout))))
+         assertion/assertions->functions
+         (assertion/assertions->with-error-handling description result/to-stdout))))
 
 (defmacro facts [& _]
-  (let [form (->> &form
-                  fact/format-description
-                  facts/add-description-to-nested-fact)]
+  (let [form (-> &form
+                 fact/format-description
+                 facts/add-description-to-nested-fact)]
     `(do ~@(body form))))

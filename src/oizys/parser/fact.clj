@@ -1,4 +1,4 @@
-(ns oizys.fact
+(ns oizys.parser.fact
   (:require
    [oizys.zip   :as ozip]
    [clojure.zip :as zip]))

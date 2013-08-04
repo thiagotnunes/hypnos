@@ -1,23 +1,36 @@
-(ns oizys.form
+(ns oizys.parser.assertion
   (:require
    [oizys.assertion :as assertion]
    [oizys.zip       :as ozip]
    [clojure.zip     :as zip]))
 
+(defn- remove-actual [form]
+  (-> form
+      ozip/remove-left
+      zip/next))
+
+(defn- remove-expected [form]
+  (-> form
+      ozip/remove-right))
+
+(defn- assertion-function [actual expected assertion-symbol]
+  (with-meta
+    `(apply ~#'assertion/confirm [~actual
+                                  ~expected
+                                  '~assertion-symbol
+                                  '(~actual ~assertion-symbol ~expected)])
+    {:oizys-assertion true}))
+
 (defn- assertion->function [form]
-  (let [actual (-> form zip/left zip/node)
+  (let [actual (ozip/left-node form)
         assertion-symbol (zip/node form)
-        expected (-> form zip/right zip/node)]
+        expected (ozip/right-node form)]
     (-> form
-        ozip/remove-left
-        zip/next
-        ozip/remove-right
-        (zip/insert-left (with-meta `(apply ~#'assertion/confirm [~actual
-                                                                  ~expected
-                                                                  '~assertion-symbol
-                                                                  '(~actual ~assertion-symbol ~expected)])
-                           {:oizys-assertion true}))
-        zip/remove)))
+        remove-actual
+        remove-expected
+        (zip/replace (assertion-function actual
+                                         expected
+                                         assertion-symbol)))))
 
 (defn- assertion->with-error-handling [form results]
   (let [assertion (zip/node form)]

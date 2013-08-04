@@ -1,4 +1,4 @@
-(ns oizys.meta
+(ns oizys.parser.meta
   (:require
    [oizys.assertion     :as assertion]
    [oizys.zip           :as ozip]
