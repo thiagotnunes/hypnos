@@ -33,12 +33,14 @@
                                          expected
                                          assertion-symbol)))))
 
-(defn- assertion->with-error-handling [form results]
+(defn- with-error-handling [form results]
   (let [assertion (zip/node form)]
     (-> form
-        (zip/insert-left (with-meta `(swap! ~results conj ~assertion)
-                           {:oizys-assertion-error-handling true}))
-        zip/remove)))
+        (zip/replace (with-meta
+                       `(swap! ~results conj ~assertion)
+                       {:oizys-assertion-error-handling true}))
+        zip/down
+        zip/rightmost)))
 
 (defn error-handling-fn [description-form]
   (let [description (second description-form)]
@@ -47,10 +49,10 @@
         `(let [~assertion-results (atom [])]
            ~@(ozip/traverse form
                             #(-> % meta :oizys-assertion)
-                            #(assertion->with-error-handling % assertion-results))
+                            #(with-error-handling % assertion-results))
            (result/to-stdout ~description ~assertion-results))))))
 
-(defn to-functions [form]
+(defn assertions->functions [form]
   (ozip/traverse form
                  assertion/assertions
                  assertion->function))
