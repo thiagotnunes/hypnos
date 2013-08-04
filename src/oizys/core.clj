@@ -4,7 +4,8 @@
    [oizys.parser.meta        :as meta]
    [oizys.parser.fact        :as fact]
    [oizys.parser.facts       :as facts]
-   [oizys.parser.future-fact :as future-fact]))
+   [oizys.parser.future-fact :as future-fact]
+   [oizys.parser.description :as description]))
 
 (defn- body [form]
   (drop 2 form))
@@ -12,7 +13,7 @@
 (defmacro fact [& _]
   (let [formatted-form (-> &form
                            meta/annotate
-                           fact/format-description)
+                           (description/format fact/fact?))
         error-handling-fn (assertion/error-handling-fn formatted-form)]
     (-> formatted-form
         body
@@ -21,11 +22,11 @@
 
 (defmacro facts [& _]
   `(do ~@(-> &form
-             fact/format-description
+             (description/format fact/fact?)
              facts/add-description-to-nested-fact
              body)))
 
 (defmacro future-fact [& _]
   (-> &form
-      future-fact/format-description
-      future-fact/report))
+      (description/format future-fact/future-fact?)
+      future-fact/warn))
