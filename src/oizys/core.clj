@@ -1,9 +1,10 @@
 (ns oizys.core
   (:require
-   [oizys.parser.assertion :as assertion]
-   [oizys.parser.meta      :as meta]
-   [oizys.parser.fact      :as fact]
-   [oizys.parser.facts     :as facts]))
+   [oizys.parser.assertion   :as assertion]
+   [oizys.parser.meta        :as meta]
+   [oizys.parser.fact        :as fact]
+   [oizys.parser.facts       :as facts]
+   [oizys.parser.future-fact :as future-fact]))
 
 (defn- body [form]
   (drop 2 form))
@@ -23,3 +24,8 @@
              fact/format-description
              facts/add-description-to-nested-fact
              body)))
+
+(defmacro future-fact [& _]
+  (-> &form
+      future-fact/format-description
+      future-fact/report))

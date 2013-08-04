@@ -3,8 +3,8 @@
    [colorize.core  :as color]
    [clojure.string :as string]))
 
-(defn- format-description [description]
-  (string/join " - " (conj (:nesting description) (:description description))))
+(defn- format-description [{description :description nesting :nesting}]
+  (string/join " - " (conj nesting description)))
 
 (defn- print-failure [{namespace :namespace
                        line :line
@@ -14,6 +14,10 @@
   (printf (color/white "\tat %s:%d\n")
           namespace
           line))
+
+(defn print-pending [description]
+  (printf (color/yellow "PENDING: \"%s\"\n")
+          (format-description description)))
 
 (defn to-stdout [description assertions-result]
   (when-let [errors (->> assertions-result
