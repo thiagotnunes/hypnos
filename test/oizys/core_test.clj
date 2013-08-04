@@ -28,10 +28,10 @@
           a => (- c b)
           1 => 1)))
 
-(facts "test"
+(facts "about first level nesting"
        (let [x 1]
-         (facts "nested"
+         (facts "about second level nesting"
                 (let [y 2]                 
-                  (fact "statement"
+                  (fact "the actual test"
                         (let [z 3]
                           (+ x y) => z))))))

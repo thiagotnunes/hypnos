@@ -4,13 +4,6 @@
    [oizys.zip       :as ozip]
    [clojure.zip     :as zip]))
 
-(defn- add-name [name form]
-  (let [fact-description (ozip/right-node form)
-        description-position (zip/right form)]
-    (if (map? fact-description)
-      (zip/replace description-position (update-in fact-description [:nesting] conj name))
-      (zip/replace description-position {:name fact-description :nesting [name]}))))
-
 (defn- assertion->function [form]
   (let [actual (-> form zip/left zip/node)
         assertion-symbol (zip/node form)
@@ -45,8 +38,3 @@
   (ozip/traverse form
                  assertion/assertions
                  assertion->function))
-
-(defn add-name-to-nested-facts [name form]
-  (ozip/traverse form
-                 #{'fact}
-                 (partial add-name name)))

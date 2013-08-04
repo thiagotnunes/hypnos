@@ -2,25 +2,28 @@
   (:require
    [oizys.meta   :as meta]
    [oizys.form   :as form]
-   [oizys.result :as result]
-   [oizys.zip    :as ozip]
-   [clojure.zip  :as zip]))
+   [oizys.fact   :as fact]
+   [oizys.facts   :as facts]
+   [oizys.result :as result]))
 
-(defn- name-from [form]
+(defn- description-from [form]
   (second form))
 
-(defn- body-from [form]
+(defn- body [form]
   (drop 2 form))
 
 (defmacro fact [& _]
-  (let [description (name-from &form)
-        fact-body (body-from &form)]
-    (->> fact-body
-         meta/annotate
+  (let [form (->> &form
+                  meta/annotate
+                  fact/format-description)
+        description (description-from form)]
+    (->> form
+         body
          form/assertions->functions
          (form/assertions->with-error-handling description result/to-stdout))))
 
 (defmacro facts [& _]
-  (let [name (name-from &form)
-        body (body-from &form)]
-    `(do ~@(form/add-name-to-nested-facts name body))))
+  (let [form (->> &form
+                  fact/format-description
+                  facts/add-description-to-nested-fact)]
+    `(do ~@(body form))))

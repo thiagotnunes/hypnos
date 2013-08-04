@@ -3,6 +3,9 @@
    [clojure.algo.monads :refer [domonad maybe-m]]
    [clojure.zip         :as zip]))
 
+(defn current-node [form]
+  (zip/node form))
+
 (defn left-node [form]
   (-> form zip/left zip/node))
 

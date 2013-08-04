@@ -4,9 +4,7 @@
    [clojure.string :as string]))
 
 (defn- format-description [description]
-  (if (map? description)
-    (string/join " - " (conj (:nesting description) (:name description)))
-    description))
+  (string/join " - " (conj (:nesting description) (:description description))))
 
 (defn- print-failure [{namespace :namespace
                        line :line
