@@ -28,7 +28,7 @@
                  should-format?
                  description->map))
 
-(defn- add-nesting-description [form description]
+(defn- nest-description [description form]
   (let [position (zip/right form)
         current-description (zip/node position)]
     (zip/replace position (update-in current-description
@@ -37,7 +37,8 @@
                                      description))))
 
 (defn add-nested [form]
-  (let [description (description form)]
+  (let [description (description form)
+        nest-description-fn (partial nest-description description)]
     (ozip/traverse form
                    should-format?
-                   #(add-nesting-description % description))))
+                   nest-description-fn)))
