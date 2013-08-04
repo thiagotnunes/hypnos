@@ -36,7 +36,8 @@
                         (let [z 3]
                           (+ x y) => z))))))
 
-(future-fact "this should not be evaluated"
-             (let [x 1]
-               (+ x 1) => 2
-               (throw Exception. "ERROR")))
+(facts "nested future facts"
+       (future-fact "this should not be evaluated"
+                    (let [x 1]
+                      (+ x 1) => 2
+                      (throw Exception. "ERROR"))))

@@ -8,6 +8,9 @@
 (defn description [form]
   (second form))
 
+(defn- should-format? [node]
+  (#{'fact 'future-fact} node))
+
 (defn- formatted? [description]
   (and (map? description)
        (:description description)
@@ -20,7 +23,21 @@
       form
       (zip/replace position {:description description :nesting []}))))
 
-(defn format [form pred]
+(defn format [form]
   (ozip/traverse form
-                 pred
+                 should-format?
                  description->map))
+
+(defn- add-nesting-description [form description]
+  (let [position (zip/right form)
+        current-description (zip/node position)]
+    (zip/replace position (update-in current-description
+                                     [:nesting]
+                                     conj
+                                     description))))
+
+(defn add-nested [form]
+  (let [description (description form)]
+    (ozip/traverse form
+                   should-format?
+                   #(add-nesting-description % description))))
