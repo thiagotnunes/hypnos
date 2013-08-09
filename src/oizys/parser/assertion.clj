@@ -4,7 +4,8 @@
    [oizys.checker   :as checker]
    [oizys.result    :as result]
    [oizys.zip       :as ozip]
-   [clojure.zip     :as zip]))
+   [clojure.zip     :as zip]
+   [potemkin        :as potemkin]))
 
 (defn- remove-actual [form]
   (-> form
@@ -56,12 +57,12 @@
 (defn error-handling-fn [description-form]
   (let [description (second description-form)]
     (fn [form]
-      (let [assertion-results (gensym "assertion_results__")]
-        `(let [~assertion-results (atom [])]
-           ~@(ozip/traverse form
-                            #(-> % meta :oizys-assertion)
-                            #(with-error-handling % assertion-results))
-           (result/to-stdout ~description ~assertion-results))))))
+      (potemkin/unify-gensyms
+       `(let [assertion-results## (atom [])]
+          ~@(ozip/traverse form
+                           #(-> % meta :oizys-assertion)
+                           #(with-error-handling % `assertion-results##))
+          (result/to-stdout ~description assertion-results##))))))
 
 (defn assertions->functions [form]
   (ozip/traverse form
