@@ -42,6 +42,11 @@
                       (+ x 3) => 2
                       (throw Exception. "ERROR"))))
 
-(facts "about checkers"
-       (fact "truthy checker"
-             1 => (truthy)))
+(fact "about truthy checker"
+       1 => (truthy)
+       () => (truthy)
+       true => (truthy))
+
+(fact "about falsey checker"
+      nil => (falsey)
+      false => (falsey))

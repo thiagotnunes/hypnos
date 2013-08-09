@@ -35,4 +35,5 @@
  [oizys.checker
 
   equal
-  truthy])
+  truthy
+  falsey])

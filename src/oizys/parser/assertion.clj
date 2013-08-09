@@ -18,7 +18,7 @@
 
 (defn- has-checker-fn? [expected]
   (and (list? expected)
-       (-> `~expected first resolve meta :checker-fn)))
+       (-> `~expected first resolve meta :oizys-checker-fn)))
 
 (defn- checker->function [actual expected]
   (if (has-checker-fn? expected)

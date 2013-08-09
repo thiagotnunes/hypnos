@@ -1,9 +1,13 @@
 (ns oizys.checker)
 
-(defn #^{:checker-fn true} equal [actual expected]
+(defn #^{:oizys-checker-fn true} equal [actual expected]
   (fn []
     (= actual expected)))
 
-(defn #^{:checker-fn true} truthy [actual]
+(defn #^{:oizys-checker-fn true} truthy [actual]
   (fn []
     actual))
+
+(defn #^{:oizys-checker-fn true} falsey [actual]
+  (fn []
+    (complement (truthy actual))))
