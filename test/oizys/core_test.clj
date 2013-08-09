@@ -1,6 +1,7 @@
 (ns oizys.core-test
   (:require
    [oizys.core         :refer :all]
+   [oizys.checker      :refer :all]
    [support.calculator :as calculator]))
 
 (fact "simple equality test"
@@ -39,5 +40,9 @@
 (facts "nested future facts"
        (future-fact "this should not be evaluated"
                     (let [x 1]
-                      (+ x 1) => 2
+                      (+ x 3) => 2
                       (throw Exception. "ERROR"))))
+
+(facts "about checkers"
+       (fact "truthy checker"
+             1 => (truthy)))

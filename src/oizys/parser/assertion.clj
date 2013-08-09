@@ -1,6 +1,7 @@
 (ns oizys.parser.assertion
   (:require
    [oizys.assertion :as assertion]
+   [oizys.checker   :as checker]
    [oizys.result    :as result]
    [oizys.zip       :as ozip]
    [clojure.zip     :as zip]))
@@ -14,10 +15,20 @@
   (-> form
       ozip/remove-right))
 
+(defn- has-checker-fn? [expected]
+  (and (list? expected)
+       (-> `~expected first resolve meta :checker-fn)))
+
+(defn- checker->function [actual expected]
+  (if (has-checker-fn? expected)
+    (if-let [args (seq (rest expected))]
+      `(~(first expected) ~actual ~args)
+      `(~(first expected) ~actual))
+    `(~#'checker/equal ~expected ~actual)))
+
 (defn- assertion-function [actual expected assertion-symbol]
   (with-meta
-    `(apply ~#'assertion/confirm [~actual
-                                  ~expected
+    `(apply ~#'assertion/confirm [~(checker->function actual expected)
                                   '~assertion-symbol
                                   '(~actual ~assertion-symbol ~expected)])
     {:oizys-assertion true}))

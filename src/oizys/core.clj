@@ -1,9 +1,9 @@
 (ns oizys.core
   (:require
-   [oizys.parser.assertion   :as assertion]
-   [oizys.parser.meta        :as meta]
    [oizys.parser.future-fact :as future-fact]
-   [oizys.parser.description :as description]))
+   [oizys.parser.description :as description]
+   [oizys.parser.assertion   :as assertion]
+   [oizys.parser.meta        :as meta]))
 
 (defn- body [form]
   (drop 2 form))
