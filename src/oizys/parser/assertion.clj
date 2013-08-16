@@ -1,11 +1,11 @@
 (ns oizys.parser.assertion
   (:require
-   [oizys.assertion :as assertion]
-   [oizys.checker   :as checker]
-   [oizys.result    :as result]
-   [oizys.zip       :as ozip]
-   [clojure.zip     :as zip]
-   [potemkin        :as potemkin]))
+   [oizys.parser.checker :as checker]
+   [oizys.assertion      :as assertion]
+   [oizys.result         :as result]
+   [oizys.zip            :as ozip]
+   [clojure.zip          :as zip]
+   [potemkin             :as potemkin]))
 
 (defn- remove-actual [form]
   (-> form
@@ -16,33 +16,10 @@
   (-> form
       ozip/remove-right))
 
-(defn- expected-fn-from [expected]
-  (if (list? expected)
-    (when (symbol? (first expected))
-      (first expected))
-    (when (symbol? expected)
-      expected)))
-
-(defn- checker-fn? [expected-fn]
-  (-> expected-fn resolve meta :oizys-checker-fn))
-
-(defn- checker-fn-from [expected]
-  (let [expected-fn (expected-fn-from expected)]
-    (when (and expected-fn (checker-fn? expected-fn))
-      (if (list? expected)
-        {:fn (first expected)
-         :args (rest expected)}
-        {:fn expected
-         :args ()}))))
-
-(defn- checker->function [actual expected]
-  (if-let [checker-fn (checker-fn-from expected)]
-    `(~(:fn checker-fn) ~actual ~@(:args checker-fn))
-    `(~#'checker/equal ~expected ~actual)))
 
 (defn- assertion-function [assertion-fn actual expected assertion-symbol]
   (with-meta
-    `(apply ~assertion-fn [~(checker->function actual expected)
+    `(apply ~assertion-fn [~(checker/checker->function actual expected)
                            '~assertion-symbol
                            '(~actual ~assertion-symbol ~expected)])
     {:oizys-assertion true}))
