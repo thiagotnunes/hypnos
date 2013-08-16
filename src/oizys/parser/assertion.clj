@@ -16,15 +16,28 @@
   (-> form
       ozip/remove-right))
 
-(defn- has-checker-fn? [expected]
-  (and (list? expected)
-       (-> `~expected first resolve meta :oizys-checker-fn)))
+(defn- expected-fn-from [expected]
+  (if (list? expected)
+    (when (symbol? (first expected))
+      (first expected))
+    (when (symbol? expected)
+      expected)))
+
+(defn- checker-fn? [expected-fn]
+  (-> expected-fn resolve meta :oizys-checker-fn))
+
+(defn- checker-fn-from [expected]
+  (let [expected-fn (expected-fn-from expected)]
+    (when (and expected-fn (checker-fn? expected-fn))
+      (if (list? expected)
+        {:fn (first expected)
+         :args ()}
+        {:fn expected
+         :args ()}))))
 
 (defn- checker->function [actual expected]
-  (if (has-checker-fn? expected)
-    (if-let [args (seq (rest expected))]
-      `(~(first expected) ~actual ~args)
-      `(~(first expected) ~actual))
+  (if-let [checker-fn (checker-fn-from expected)]
+    `(~(:fn checker-fn) ~actual ~@(:args checker-fn))
     `(~#'checker/equal ~expected ~actual)))
 
 (defn- assertion-function [actual expected assertion-symbol]

@@ -8,7 +8,7 @@ A Clojure testing library
 (facts "about the initial tests"
   (fact "this should pass"
     1 => 1)
-  
+
   (fact "this should not pass"
     1 => 2))
 ```
