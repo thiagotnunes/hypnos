@@ -10,6 +10,16 @@
 (defn- body [form]
   (drop 2 form))
 
+(defmacro failing-fact [& _]
+  (let [formatted-form (-> &form
+                           meta/annotate
+                           description/format)
+        error-handling-fn (assertion/error-handling-fn formatted-form)]
+    (-> formatted-form
+        body
+        assertion/assertions->fail-functions
+        error-handling-fn)))
+
 (defmacro fact [& _]
   (let [formatted-form (-> &form
                            meta/annotate
@@ -17,7 +27,7 @@
         error-handling-fn (assertion/error-handling-fn formatted-form)]
     (-> formatted-form
         body
-        assertion/assertions->functions
+        assertion/assertions->confirm-functions
         error-handling-fn)))
 
 (defmacro facts [& _]

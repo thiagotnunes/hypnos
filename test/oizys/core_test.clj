@@ -36,17 +36,36 @@
           (let [z 3]
             (+ x y) => z))))))
 
+(facts "about first level nesting"
+  (let [x 1]
+    (facts "about second level nesting"
+      (let [y 2]                 
+        (failing-fact "the actual failing test"
+          (let [z 3]
+            (+ x z) => y))))))
+
 (facts "nested future facts"
   (future-fact "this should not be evaluated"
                (let [x 1]
                  (+ x 3) => 2
                  (throw Exception. "ERROR"))))
 
-(fact "about truthy checker"
-  1 => truthy
-  () => truthy
-  true => truthy)
+(facts "about truthy checker"
+  (fact "some success cases"
+    1 => truthy
+    () => truthy
+    true => truthy)
+  
+  (failing-fact "truthy checker failing cases"
+    nil => truthy
+    false => truthy))
 
-(fact "about falsey checker"
-  nil => falsey
-  false => falsey)
+(facts "about falsey checker"
+  (fact "success cases"
+    nil => falsey
+    false => falsey)
+
+  (failing-fact "some failing cases"
+    1 => falsey
+    () => falsey
+    true => falsey))

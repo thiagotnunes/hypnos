@@ -10,4 +10,4 @@
 
 (defn #^{:oizys-checker-fn true} falsey [actual]
   (fn []
-    (complement (truthy actual))))
+    (not actual)))

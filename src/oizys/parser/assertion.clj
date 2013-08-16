@@ -40,21 +40,22 @@
     `(~(:fn checker-fn) ~actual ~@(:args checker-fn))
     `(~#'checker/equal ~expected ~actual)))
 
-(defn- assertion-function [actual expected assertion-symbol]
+(defn- assertion-function [assertion-fn actual expected assertion-symbol]
   (with-meta
-    `(apply ~#'assertion/confirm [~(checker->function actual expected)
-                                  '~assertion-symbol
-                                  '(~actual ~assertion-symbol ~expected)])
+    `(apply ~assertion-fn [~(checker->function actual expected)
+                           '~assertion-symbol
+                           '(~actual ~assertion-symbol ~expected)])
     {:oizys-assertion true}))
 
-(defn- assertion->function [form]
+(defn- assertion->function [form assertion-fn]
   (let [actual (ozip/left-node form)
         assertion-symbol (zip/node form)
         expected (ozip/right-node form)]
     (-> form
         remove-actual
         remove-expected
-        (zip/replace (assertion-function actual
+        (zip/replace (assertion-function assertion-fn
+                                         actual
                                          expected
                                          assertion-symbol)))))
 
@@ -77,7 +78,12 @@
                            #(with-error-handling % `assertion-results##))
           (result/to-stdout ~description assertion-results##))))))
 
-(defn assertions->functions [form]
+(defn assertions->confirm-functions [form]
   (ozip/traverse form
                  assertion/assertions
-                 assertion->function))
+                 #(assertion->function % #'assertion/confirm)))
+
+(defn assertions->fail-functions [form]
+  (ozip/traverse form
+                 assertion/assertions
+                 #(assertion->function % #'assertion/fail)))
