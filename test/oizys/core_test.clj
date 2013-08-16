@@ -69,3 +69,14 @@
     1 => falsey
     () => falsey
     true => falsey))
+
+(defchecker zero? [actual]
+  (= actual 0))
+
+(facts "about custom checkers"
+  (fact "success case"
+    0 => zero?)
+
+  (failing-fact "some failing cases"
+    1 => zero?
+    10 => zero?))

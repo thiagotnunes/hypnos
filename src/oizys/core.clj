@@ -46,4 +46,5 @@
 
   equal
   truthy
-  falsey])
+  falsey
+  defchecker])
