@@ -8,7 +8,8 @@
   (let [assertion-fn (assertions assertion)
         metadata (meta assertion)]
     (when-not (assertion-fn checker-fn)
-      {:expression expression
+      {:type :confirm
+       :expression expression
        :assertion assertion
        :line (:line metadata)
        :namespace (ns-name *ns*)})))
@@ -17,7 +18,8 @@
   (let [assertion-fn (assertions assertion)
         metadata (meta assertion)]
     (when (assertion-fn checker-fn)
-      {:expression expression
+      {:type :refute
+       :expression expression
        :assertion assertion
        :line (:line metadata)
        :namespace (ns-name *ns*)})))

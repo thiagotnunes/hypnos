@@ -6,11 +6,15 @@
 (defn- format-description [{description :description nesting :nesting}]
   (string/join " - " (conj nesting description)))
 
-(defn- print-failure [{namespace :namespace
+(defn- print-failure [{type :type
+                       namespace :namespace
                        line :line
                        expression :expression}]
-  (printf (color/white "\tExpected: %s\n")
-          expression)
+  (case type
+    :confirm (printf (color/white "\tExpected: %s\n")
+                     expression)
+    :refute (printf (color/white "\tExpected not: %s\n")
+                     expression))
   (printf (color/white "\tat %s:%d\n")
           namespace
           line))
