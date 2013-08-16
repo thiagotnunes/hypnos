@@ -17,7 +17,7 @@
         error-handling-fn (assertion/error-handling-fn formatted-form)]
     (-> formatted-form
         body
-        assertion/assertions->fail-functions
+        assertion/assertions->refute-functions
         error-handling-fn)))
 
 (defmacro fact [& _]

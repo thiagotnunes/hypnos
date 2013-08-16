@@ -13,7 +13,7 @@
        :line (:line metadata)
        :namespace (ns-name *ns*)})))
 
-(defn fail [checker-fn assertion expression]
+(defn refute [checker-fn assertion expression]
   (let [assertion-fn (assertions assertion)
         metadata (meta assertion)]
     (when (assertion-fn checker-fn)

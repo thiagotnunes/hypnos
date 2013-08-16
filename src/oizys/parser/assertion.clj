@@ -31,7 +31,7 @@
     (when (and expected-fn (checker-fn? expected-fn))
       (if (list? expected)
         {:fn (first expected)
-         :args ()}
+         :args (rest expected)}
         {:fn expected
          :args ()}))))
 
@@ -83,7 +83,7 @@
                  assertion/assertions
                  #(assertion->function % #'assertion/confirm)))
 
-(defn assertions->fail-functions [form]
+(defn assertions->refute-functions [form]
   (ozip/traverse form
                  assertion/assertions
-                 #(assertion->function % #'assertion/fail)))
+                 #(assertion->function % #'assertion/refute)))
