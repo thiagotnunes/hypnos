@@ -1,4 +1,4 @@
-(ns oizys.checker)
+(ns oizys.checkers.core)
 
 (defmacro defchecker [name params & form]
   `(defn ~(with-meta name (assoc (meta name) :oizys-checker-fn true)) ~params

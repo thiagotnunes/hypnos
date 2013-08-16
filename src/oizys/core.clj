@@ -4,7 +4,6 @@
    [oizys.parser.description :as description]
    [oizys.parser.assertion   :as assertion]
    [oizys.parser.meta        :as meta]
-   [oizys.checker            :as checker]
    [potemkin                 :as potemkin]))
 
 (defn- body [form]
@@ -42,9 +41,9 @@
       future-fact/warn))
 
 (potemkin/import-vars
- [oizys.checker
+ [oizys.checkers.core
 
+  defchecker
   equal
   truthy
-  falsey
-  defchecker])
+  falsey])

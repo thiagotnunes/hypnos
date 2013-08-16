@@ -1,6 +1,6 @@
 (ns oizys.parser.checker
   (:require
-   [oizys.checker :as checker]))
+   [oizys.checkers.core :as checker]))
 
 (defn- expected-fn-from [expected]
   (if (list? expected)
