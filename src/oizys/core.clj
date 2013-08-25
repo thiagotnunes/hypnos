@@ -1,10 +1,12 @@
 (ns oizys.core
   (:require
-   [oizys.parser.future-fact :as future-fact]
-   [oizys.parser.description :as description]
-   [oizys.parser.assertion   :as assertion]
-   [oizys.parser.meta        :as meta]
-   [potemkin                 :as potemkin]))
+   [oizys.parser.future-fact   :as future-fact]
+   [oizys.parser.description   :as description]
+   [oizys.parser.assertion     :as assertion]
+   [oizys.parser.meta          :as meta]
+   [potemkin                   :as potemkin]
+   [oizys.checkers.core        :as checkers]
+   [oizys.checkers.collections :as collections]))
 
 (defn- body [form]
   (drop 2 form))
@@ -42,8 +44,13 @@
 
 (potemkin/import-vars
  [oizys.checkers.core
-
+  
   defchecker
+  _
   equal
   truthy
-  falsey])
+  falsey]
+ 
+ [oizys.checkers.collections
+
+  contains])

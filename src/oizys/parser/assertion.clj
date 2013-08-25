@@ -16,7 +16,6 @@
   (-> form
       ozip/remove-right))
 
-
 (defn- assertion-function [assertion-fn actual expected assertion-symbol]
   (with-meta
     `(apply ~assertion-fn [~(checker/checker->function actual expected)

@@ -1,26 +1,15 @@
-(ns oizys.checkers.collections
+(ns oizys.checkers.collections-test
   (:require
    [oizys.core :refer :all]))
 
-(future-fact "contains some"
-  [1 2 3] => (contains [2 3])
-  '(1 2 3) => (contains '(2 3))
-  #{1 2 3} => (contains #{2 3})
-  {:animals {:meerkats {:babies 1
-                        :teenagers 2
-                        :adults 3}}}
-  => (contains {:babies 1})
-  {:animals {:meerkats {:babies 1
-                        :teenagers 2
-                        :adults 3}}}
-  => (contains {_ {_ {:babies 1}}}))
+(facts "about contains"
+  (fact "for vectors"
+    [1 2 3] => (contains 2)
+    [1 2 3] => (contains [1 _ 3])
+    [1 2 3] => (contains [1 _ _])
+    [1 2 3] => (contains [_ _ _]))
 
-(future-fact "starts-with"
-  [1 2 3] => (starts-with [1 2])
-  '(1 2 3) => (starts-with '(1 2))
-  #{1 2 3} => (contains #{1 2})
-
-(future-fact "ends-with"
-  [1 2 3] => (ends-with [2 3])
-  '(1 2 3) => (ends-with '(2 3))
-  #{1 2 3} => (ends-with #{2 3}))
+  (failing-fact "for vectors"
+    [1 2 3] => (contains 4)
+    [1 2 3] => (contains [1 2])
+    [1 2 3] => (contains [_ 2 4])))

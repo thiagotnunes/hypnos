@@ -32,3 +32,9 @@
   (failing-fact "some failing cases"
     1 => zero?
     10 => zero?))
+
+(fact "parallel execution"
+  (letfn [(my-func [x] (+ x 2))
+          (my-func-caller [data] (pmap my-func data))
+          (do-something [] (my-func-caller [1 2 3]))]
+    (do-something) => [3 4 5]))
