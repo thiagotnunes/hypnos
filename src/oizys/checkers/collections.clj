@@ -2,9 +2,15 @@
   (:require
    [clojure.data        :as data]
    [clojure.set         :as set]
-   [oizys.checkers.core :refer [defchecker]]))
+   [oizys.checkers.core :refer [defchecker]]
+   [clojure.core.match  :refer [match]]))
+
+(defn- match-collection [actual expected]
+  (match expected
+         actual true
+         :else false))
 
 (defchecker contains [actual expected]
-  (cond
-   (vector? expected) (= expected actual)
-   :else              (some #{expected} actual)))
+  (if (coll? expected)
+    (match-collection actual expected)
+    (some #{expected} actual)))
