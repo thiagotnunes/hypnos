@@ -46,11 +46,10 @@
  [oizys.checkers.core
   
   defchecker
-  _
   equal
   truthy
   falsey]
  
  [oizys.checkers.collections
 
-  contains])
+  matches])

@@ -5,12 +5,8 @@
    [oizys.checkers.core :refer [defchecker]]
    [clojure.core.match  :refer [match]]))
 
-(defn- match-collection [actual expected]
-  (match expected
-         actual true
-         :else false))
-
-(defchecker contains [actual expected]
-  (if (coll? expected)
-    (match-collection actual expected)
-    (some #{expected} actual)))
+(defmacro ^{:oizys-checker-fn true} matches [actual expected]
+  `(fn []
+     (match [~actual]
+            [~expected] true
+            :else false)))

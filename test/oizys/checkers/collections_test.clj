@@ -4,12 +4,13 @@
 
 (facts "about contains"
   (fact "for vectors"
-    [1 2 3] => (contains 2)
-    [1 2 3] => (contains [1 _ 3])
-    [1 2 3] => (contains [1 _ _])
-    [1 2 3] => (contains [_ _ _]))
+    [1 2 3] => (matches [1 2 3])
+    [1 2 3] => (matches [1 _ 3])
+    [1 2 3] => (matches [1 _ _])
+    [1 2 3] => (matches [_ _ _]))
 
   (failing-fact "for vectors"
-    [1 2 3] => (contains 4)
-    [1 2 3] => (contains [1 2])
-    [1 2 3] => (contains [_ 2 4])))
+    [1 2 3] => (matches [1 2 3 4])
+    [1 2 3] => (matches [1 2 4])
+    [1 2 3] => (matches [1 _ 4])
+    [1 2 3] => (matches [_ _ 4])))

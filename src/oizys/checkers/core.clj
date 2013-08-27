@@ -5,8 +5,6 @@
      (fn []
        ~@form)))
 
-(def ^{:oizys-matcher :anything} _ (proxy [Object] [] (equals [_] true)))
-
 (defchecker equal [actual expected]
   (= actual expected))
 
