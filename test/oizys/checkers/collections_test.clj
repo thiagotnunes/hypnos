@@ -18,6 +18,10 @@
       [1 2 3] => (matches [1 _ _])
       [1 2 3] => (matches [_ _ _]))
 
+    (fact "with rest"
+      [1 2 3] => (matches [1 & r])
+      [1 2 3] => (matches [1 2 & r]))
+
     (lie "matches"
       (let [d 4]
         [1 2 3] => (matches [1 2 3 d])
