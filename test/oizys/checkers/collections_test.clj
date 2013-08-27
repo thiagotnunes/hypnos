@@ -22,9 +22,15 @@
       [1 2 3] => (matches [1 & r])
       [1 2 3] => (matches [1 2 & r]))
 
+    (fact "with or patterns"
+      [1 2 3] => (matches [1 (:or 2 3 4 5) 3]))
+
     (lie "matches"
       (let [d 4]
-        [1 2 3] => (matches [1 2 3 d])
         [1 2 3] => (matches [1 2 4])
+        [1 2 3] => (matches [1 2 3 d])
         [1 2 3] => (matches [1 _ 4])
-        [1 2 3] => (matches [_ _ 4])))))
+        [1 2 3] => (matches [_ _ 4])
+        [1 2 3] => (matches [1 2 3 4 & r])
+        [1 2 3] => (matches [2 3 & r])
+        [1 2 3] => (matches [1 (:or 3 4 5) 3])))))
