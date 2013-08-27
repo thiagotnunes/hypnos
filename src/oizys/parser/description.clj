@@ -9,7 +9,7 @@
   (second form))
 
 (defn- should-format? [node]
-  (#{'fact 'future-fact 'failing-fact} node))
+  (#{'fact 'future-fact 'lie} node))
 
 (defn- formatted? [description]
   (and (map? description)
