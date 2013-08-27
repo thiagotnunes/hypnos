@@ -50,4 +50,12 @@
     (lie "matches"
       {:a 1 :b 2} => (matches {:a 1 :b 1})
       {:a 1 :b 2} => (matches {:c 1 :b 2})
-      {:a 1 :b 2 :c 3} => (matches ({:a 1 :b 2} :only [:a :b])))))
+      {:a 1 :b 2 :c 3} => (matches ({:a 1 :b 2} :only [:a :b]))))
+
+  (facts "for sets"
+    (fact "simple matching"
+      #{1 2 3} => (matches #{1 2 3}))
+    
+    (lie "matches"
+      #{1 2 3} => (matches #{1 2 4})
+      #{1 2 3} => (matches #{1 2}))))
