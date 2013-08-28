@@ -52,4 +52,6 @@
  
  [oizys.checkers.collections
 
-  matches])
+  matches
+  starts-with
+  ends-with])

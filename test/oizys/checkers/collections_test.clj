@@ -59,3 +59,41 @@
     (lie "matches"
       #{1 2 3} => (matches #{1 2 4})
       #{1 2 3} => (matches #{1 2}))))
+
+(facts "about starts-with"
+  (fact "for vectors"
+    [1 2 3] => (starts-with [1])
+    [1 2 3] => (starts-with [1 2])
+    [1 2 3] => (starts-with [1 2 3]))
+
+  (fact "for strings"
+    "hello there" => (starts-with "h")
+    "hello there" => (starts-with "hello")
+    "hello there" => (starts-with "hello there"))
+
+  (lie "for vectors"
+    [1 2 3] => (starts-with [2])
+    [1 2 3] => (starts-with [1 2 3 4 5]))
+
+  (lie "for strings"
+    "hello there" => (starts-with "ello")
+    "hello there" => (starts-with "hello there my friend")))
+
+(facts "about ends-with"
+  (fact "for vectors"
+    [1 2 3] => (ends-with [3])
+    [1 2 3] => (ends-with [2 3])
+    [1 2 3] => (ends-with [1 2 3]))
+
+  (fact "for strings"
+    "hello there" => (ends-with "e")
+    "hello there" => (ends-with "there")
+    "hello there" => (ends-with "hello there"))
+
+  (lie "for vectors"
+    [1 2 3] => (ends-with [1])
+    [1 2 3] => (ends-with [1 2 3 4]))
+
+  (lie "for strings"
+    "hello there" => (ends-with "ther")
+    "hello there" => (ends-with "hello there my friend")))
