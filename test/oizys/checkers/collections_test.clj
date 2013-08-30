@@ -105,3 +105,8 @@
   (fact "for unsupported types"
     (#{1 2 3} => (ends-with #{3})) => (throws RuntimeException)
     ({1 2} => (ends-with #{2})) => (throws RuntimeException)))
+
+(fact "negating checkers"
+  [1 2 3] => (not (matches [1 _ 4]))
+  [1 2 3] => (not (starts-with [2]))
+  [1 2 3] => (not (ends-with [2])))

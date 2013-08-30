@@ -62,3 +62,8 @@
     0.21 => (roughly 0.1)
     0.11 => (roughly 0.1 0.001)
     0.09 => (roughly 0.1 0.001)))
+
+(fact "negating checkers"
+  nil => (not truthy)
+  1 => (not falsey)
+  1 => (not zero?))
