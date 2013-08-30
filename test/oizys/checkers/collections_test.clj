@@ -77,7 +77,11 @@
 
   (lie "for strings"
     "hello there" => (starts-with "ello")
-    "hello there" => (starts-with "hello there my friend")))
+    "hello there" => (starts-with "hello there my friend"))
+
+  (fact "for unsupported types"
+    (#{1 2 3} => (starts-with #{3})) => (throws RuntimeException)
+    ({1 2} => (starts-with #{2})) => (throws RuntimeException)))
 
 (facts "about ends-with"
   (fact "for vectors"
@@ -96,4 +100,8 @@
 
   (lie "for strings"
     "hello there" => (ends-with "ther")
-    "hello there" => (ends-with "hello there my friend")))
+    "hello there" => (ends-with "hello there my friend"))
+
+  (fact "for unsupported types"
+    (#{1 2 3} => (ends-with #{3})) => (throws RuntimeException)
+    ({1 2} => (ends-with #{2})) => (throws RuntimeException)))
