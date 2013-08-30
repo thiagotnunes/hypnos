@@ -40,7 +40,7 @@
   (let [x 1]
     (facts "about second level nesting"
       (let [y 2]                 
-        (failing-fact "the actual failing test"
+        (lie "the actual failing test"
           (let [z 3]
             (+ x z) => y))))))
 
