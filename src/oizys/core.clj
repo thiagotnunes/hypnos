@@ -48,7 +48,8 @@
   defchecker
   equal
   truthy
-  falsey]
+  falsey
+  throws]
  
  [oizys.checkers.collections
 

@@ -38,3 +38,16 @@
           (my-func-caller [data] (pmap my-func data))
           (do-something [] (my-func-caller [1 2 3]))]
     (do-something) => [3 4 5]))
+
+(facts "about exceptions"
+  (fact "is successful when the exception is of the same type"
+    (letfn [(bang! [] (throw (RuntimeException. "bang")))]
+      (bang!) => (throws RuntimeException)))
+
+  (fact "is sucessful when the exception is instance of given one"
+    (letfn [(boom! [] (throw (IllegalStateException. "boom")))]
+      (boom!) => (throws Exception)))
+
+  (lie "exceptions mismatching"
+    (letfn [(pow! [] (throw (IllegalStateException. "boom")))]
+      (pow!) => (throws IllegalAccessError))))

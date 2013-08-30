@@ -13,3 +13,11 @@
 
 (defchecker falsey [actual]
   (not actual))
+
+(defmacro ^{:oizys-checker-fn true} throws [actual expected]
+  `(fn []
+     (try
+       ~actual
+       false
+       (catch Throwable e#
+         (instance? ~expected e#)))))
