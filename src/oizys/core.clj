@@ -49,7 +49,8 @@
   equal
   truthy
   falsey
-  throws]
+  throws
+  roughly]
  
  [oizys.checkers.collections
 

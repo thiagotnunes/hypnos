@@ -21,3 +21,8 @@
        false
        (catch Throwable e#
          (instance? ~expected e#)))))
+
+(defchecker roughly [actual expected & [expected-error]]
+  (let [error (or expected-error 0.1)]
+    (and (>= actual (- expected error))
+         (<= actual (+ expected error)))))

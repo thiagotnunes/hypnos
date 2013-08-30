@@ -51,3 +51,14 @@
   (lie "exceptions mismatching"
     (letfn [(pow! [] (throw (IllegalStateException. "boom")))]
       (pow!) => (throws IllegalAccessError))))
+
+(facts "roughly"
+  (fact "checks if value is within the tolerance"
+    0.11 => (roughly 0.1)
+    0.09 => (roughly 0.1)
+    0.3 => (roughly 0.1 0.2))
+
+  (lie "surpasses given tolerance"
+    0.21 => (roughly 0.1)
+    0.11 => (roughly 0.1 0.001)
+    0.09 => (roughly 0.1 0.001)))
