@@ -1,14 +1,12 @@
 (ns oizys.parser.description
   (:require
    [clojure.zip :as zip]
-   [oizys.zip   :as ozip])
-  (:refer-clojure
-   :exclude [format]))
+   [oizys.zip   :as ozip]))
 
 (defn description [form]
   (second form))
 
-(defn- should-format? [node]
+(defn- should-normalize? [node]
   (#{'fact 'future-fact 'failing-fact} node))
 
 (defn- formatted? [description]
@@ -16,17 +14,17 @@
        (:description description)
        (:nesting description)))
 
-(defn- description->map [form]
+(defn- normalize [form]
   (let [position (zip/right form)
         description (zip/node position)]
     (if (formatted? description)
       form
       (zip/replace position {:description description :nesting []}))))
 
-(defn format [form]
+(defn normalize [form]
   (ozip/traverse form
-                 should-format?
-                 description->map))
+                 should-normalize?
+                 normalize))
 
 (defn- nest-description [description form]
   (let [position (zip/right form)
@@ -40,5 +38,5 @@
   (let [description (description form)
         nest-description-fn (partial nest-description description)]
     (ozip/traverse form
-                   should-format?
+                   should-normalize?
                    nest-description-fn)))

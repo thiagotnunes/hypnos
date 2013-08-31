@@ -1,8 +1,9 @@
-(ns oizys.parser.meta
+(ns oizys.parser.metadata
   (:require
-   [oizys.assertion     :as assertion]
-   [oizys.zip           :as ozip]
-   [clojure.zip         :as zip]))
+   [oizys.assertion :as assertion]
+   [oizys.zip       :as ozip]
+   
+   [clojure.zip     :as zip]))
 
 (defn- line-number [node]
   (-> node meta :line))

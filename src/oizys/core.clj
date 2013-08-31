@@ -3,10 +3,12 @@
    [oizys.parser.future-fact   :as future-fact]
    [oizys.parser.description   :as description]
    [oizys.parser.assertion     :as assertion]
-   [oizys.parser.meta          :as meta]
-   [potemkin                   :as potemkin]
+   [oizys.parser.metadata      :as metadata]
+   
+   [oizys.checkers.collections :as collections]
    [oizys.checkers.core        :as checkers]
-   [oizys.checkers.collections :as collections]))
+   
+   [potemkin                   :as potemkin]))
 
 (defn- fact-body [form]
   (->> form
@@ -18,29 +20,29 @@
 
 (defmacro failing-fact [& _]
   (-> &form
-      meta/annotate
-      description/format
+      metadata/annotate
+      description/normalize
       assertion/assertions->refute-functions
       assertion/error-handling
       fact-body))
 
 (defmacro fact [& _]
   (-> &form
-      meta/annotate
-      description/format
+      metadata/annotate
+      description/normalize
       assertion/assertions->confirm-functions
       assertion/error-handling
       fact-body))
 
 (defmacro facts [& _]
   `(do ~@(-> &form
-             description/format
+             description/normalize
              description/add-nested
              facts-body)))
 
 (defmacro future-fact [& _]
   (-> &form
-      description/format
+      description/normalize
       future-fact/warn))
 
 (potemkin/import-vars
