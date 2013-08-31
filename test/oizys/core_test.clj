@@ -40,12 +40,12 @@
   (let [x 1]
     (facts "about second level nesting"
       (let [y 2]                 
-        (lie "fails when adding two numbers do not output the expected result"
+        (failing-fact "adding two numbers do not output the expected result"
           (let [z 3]
             (+ x z) => y))))))
 
 (facts "nested future facts"
   (future-fact "this is not evaluated"
-               (let [x 1]
-                 (+ x 3) => 2
-                 (throw Exception. "ERROR"))))
+    (let [x 1]
+      (+ x 3) => 2
+      (throw Exception. "ERROR"))))

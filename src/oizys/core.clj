@@ -11,7 +11,7 @@
 (defn- body [form]
   (drop 2 form))
 
-(defmacro lie [& _]
+(defmacro failing-fact [& _]
   (let [formatted-form (-> &form
                            meta/annotate
                            description/format)

@@ -25,7 +25,7 @@
     (fact "with or patterns"
       [1 2 3] => (matches [1 (:or 2 3 4 5) 3]))
 
-    (lie "matches"
+    (failing-fact "matches"
       (let [d 4]
         [1 2 3] => (matches [1 2 4])
         [1 2 3] => (matches [1 2 3 d])
@@ -47,7 +47,7 @@
       {:a 1 :b 2} => (matches {:a _})
       {:nested {:a 1 :b 2}} => (matches {:nested {:a _}}))
 
-    (lie "matches"
+    (failing-fact "matches"
       {:a 1 :b 2} => (matches {:a 1 :b 1})
       {:a 1 :b 2} => (matches {:c 1 :b 2})
       {:a 1 :b 2 :c 3} => (matches ({:a 1 :b 2} :only [:a :b]))))
@@ -56,7 +56,7 @@
     (fact "simple matching"
       #{1 2 3} => (matches #{1 2 3}))
     
-    (lie "matches"
+    (failing-fact "matches"
       #{1 2 3} => (matches #{1 2 4})
       #{1 2 3} => (matches #{1 2}))))
 
@@ -71,11 +71,11 @@
     "hello there" => (starts-with "hello")
     "hello there" => (starts-with "hello there"))
 
-  (lie "for vectors"
+  (failing-fact "for vectors"
     [1 2 3] => (starts-with [2])
     [1 2 3] => (starts-with [1 2 3 4 5]))
 
-  (lie "for strings"
+  (failing-fact "for strings"
     "hello there" => (starts-with "ello")
     "hello there" => (starts-with "hello there my friend"))
 
@@ -94,11 +94,11 @@
     "hello there" => (ends-with "there")
     "hello there" => (ends-with "hello there"))
 
-  (lie "for vectors"
+  (failing-fact "for vectors"
     [1 2 3] => (ends-with [1])
     [1 2 3] => (ends-with [1 2 3 4]))
 
-  (lie "for strings"
+  (failing-fact "for strings"
     "hello there" => (ends-with "ther")
     "hello there" => (ends-with "hello there my friend"))
 

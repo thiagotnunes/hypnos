@@ -8,7 +8,7 @@
     () => truthy
     true => truthy)
   
-  (lie "nil and false are not truthy"
+  (failing-fact "nil and false are not truthy"
     nil => truthy
     false => truthy))
 
@@ -17,7 +17,7 @@
     nil => falsey
     false => falsey)
 
-  (lie "anything but nil and false are not falsey"
+  (failing-fact "anything but nil and false are not falsey"
     1 => falsey
     () => falsey
     true => falsey))
@@ -29,7 +29,7 @@
   (fact "0 is zero"
     0 => zero?)
 
-  (lie "non 0 values are not zero"
+  (failing-fact "non 0 values are not zero"
     1 => zero?
     10 => zero?))
 
@@ -48,7 +48,7 @@
     (letfn [(boom! [] (throw (IllegalStateException. "boom")))]
       (boom!) => (throws Exception)))
 
-  (lie "fails when exceptions are not related"
+  (failing-fact "fails when exceptions are not related"
     (letfn [(pow! [] (throw (IllegalStateException. "boom")))]
       (pow!) => (throws IllegalAccessError))))
 
@@ -58,7 +58,7 @@
     0.09 => (roughly 0.1)
     0.3 => (roughly 0.1 0.2))
 
-  (lie "values are not within the given deltas"
+  (failing-fact "values are not within the given deltas"
     0.21 => (roughly 0.1)
     0.11 => (roughly 0.1 0.001)
     0.09 => (roughly 0.1 0.001)))
