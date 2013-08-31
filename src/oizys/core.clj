@@ -8,34 +8,35 @@
    [oizys.checkers.core        :as checkers]
    [oizys.checkers.collections :as collections]))
 
-(defn- body [form]
+(defn- fact-body [form]
+  (->> form
+       (drop 2)
+       first))
+
+(defn- facts-body [form]
   (drop 2 form))
 
 (defmacro failing-fact [& _]
-  (let [formatted-form (-> &form
-                           meta/annotate
-                           description/format)
-        error-handling-fn (assertion/error-handling-fn formatted-form)]
-    (-> formatted-form
-        body
-        assertion/assertions->refute-functions
-        error-handling-fn)))
+  (-> &form
+      meta/annotate
+      description/format
+      assertion/assertions->refute-functions
+      assertion/error-handling
+      fact-body))
 
 (defmacro fact [& _]
-  (let [formatted-form (-> &form
-                           meta/annotate
-                           description/format)
-        error-handling-fn (assertion/error-handling-fn formatted-form)]
-    (-> formatted-form
-        body
-        assertion/assertions->confirm-functions
-        error-handling-fn)))
+  (-> &form
+      meta/annotate
+      description/format
+      assertion/assertions->confirm-functions
+      assertion/error-handling
+      fact-body))
 
 (defmacro facts [& _]
   `(do ~@(-> &form
              description/format
              description/add-nested
-             body)))
+             facts-body)))
 
 (defmacro future-fact [& _]
   (-> &form

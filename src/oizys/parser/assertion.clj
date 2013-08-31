@@ -44,15 +44,17 @@
         zip/down
         zip/rightmost)))
 
-(defn error-handling-fn [description-form]
-  (let [description (second description-form)]
-    (fn [form]
-      (potemkin/unify-gensyms
-       `(let [assertion-results## (atom [])]
-          ~@(ozip/traverse form
-                           #(-> % meta :oizys-assertion)
-                           #(with-error-handling % `assertion-results##))
-          (result/to-stdout ~description assertion-results##))))))
+(defn error-handling [form]
+  (let [name (first form)
+        description (second form)
+        body (drop 2 form)]
+    (potemkin/unify-gensyms
+     `(~name ~description
+       (let [assertion-results## (atom [])]
+         ~@(ozip/traverse body
+                          #(-> % meta :oizys-assertion)
+                          #(with-error-handling % `assertion-results##))
+         (result/to-stdout ~description assertion-results##))))))
 
 (defn assertions->confirm-functions [form]
   (ozip/traverse form
