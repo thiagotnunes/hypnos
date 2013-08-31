@@ -3,28 +3,28 @@
    [oizys.core         :refer :all]
    [support.calculator :as calculator]))
 
-(fact "simple equality test"
+(fact "1 is equal to 1"
   1 => 1)
 
-(fact "simple expression test"
+(fact "1 plus 1 is equal to 2"
   (+ 1 1) => 2)
 
-(fact "multiple assertions test"
+(fact "adding two numbers is equal to the sum of them"
   (+ 1 1) => 2
   (+ 1 2) => 3)
 
-(fact "nested expressions test"
+(fact "facts accept scoping"
   (let [a 1
         b 2]
     (+ a a) => b))
 
-(fact "namespace resolution on actual"
+(fact "facts correctly resolve the namespace on it's body"
   (calculator/plus 1 1) => 2)
 
 (let [a 1
       c 3]
   (let [b 2]
-    (fact "testing about scoping"
+    (fact "facts correctly resolve multiple scoping"
       a => (- c b)
       1 => 1)))
 
@@ -32,7 +32,7 @@
   (let [x 1]
     (facts "about second level nesting"
       (let [y 2]                 
-        (fact "the actual test"
+        (fact "facts can be nested within several facts"
           (let [z 3]
             (+ x y) => z))))))
 
@@ -40,12 +40,12 @@
   (let [x 1]
     (facts "about second level nesting"
       (let [y 2]                 
-        (lie "the actual failing test"
+        (lie "fails when adding two numbers do not output the expected result"
           (let [z 3]
             (+ x z) => y))))))
 
 (facts "nested future facts"
-  (future-fact "this should not be evaluated"
+  (future-fact "this is not evaluated"
                (let [x 1]
                  (+ x 3) => 2
                  (throw Exception. "ERROR"))))
