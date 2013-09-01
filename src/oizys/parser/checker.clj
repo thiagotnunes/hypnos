@@ -11,28 +11,28 @@
     (when (symbol? expected)
       expected)))
 
-(defn- checker-fn? [expected-fn]
-  (-> expected-fn resolve meta :oizys-checker-fn))
+(defn- has-checker-fn? [expected]
+  (when-let [expected-fn (expected-fn-from expected)]
+    (-> expected-fn resolve meta :oizys-checker-fn)))
 
 (defn- checker-from [expected]
-  (let [expected-fn (expected-fn-from expected)]
-    (when (and expected-fn (checker-fn? expected-fn))
-      (if (list? expected)
-        {:fn (first expected)
-         :args (rest expected)}
-        {:fn expected
-         :args ()}))))
+  (when (has-checker-fn? expected)
+    (if (list? expected)
+      {:fn (first expected)
+       :args (rest expected)}
+      {:fn expected
+       :args ()})))
 
 (defn- wrapper-from [expected]
   (when (list? expected)
     (some wrappers expected)))
 
-(defn- build-expectation [actual expected]
+(defn- checking-function [actual expected]
   (if-let [checker (checker-from expected)]
     `(~(:fn checker) ~actual ~@(:args checker))
     `(~#'checker/equal ~expected ~actual)))
 
 (defn checker->function [actual expected]
   (if-let [wrapper (wrapper-from expected)]
-    `(~wrapper ~(build-expectation actual (second expected)))
-    (build-expectation actual expected)))
+    `(~wrapper ~(checking-function actual (second expected)))
+    (checking-function actual expected)))
