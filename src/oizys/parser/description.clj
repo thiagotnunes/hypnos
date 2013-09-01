@@ -9,22 +9,22 @@
 (defn- should-normalize? [node]
   (#{'fact 'future-fact 'failing-fact} node))
 
-(defn- formatted? [description]
+(defn- normalized? [description]
   (and (map? description)
        (:description description)
        (:nesting description)))
 
-(defn- normalize [form]
+(defn- normalize-description [form]
   (let [position (zip/right form)
         description (zip/node position)]
-    (if (formatted? description)
+    (if (normalized? description)
       form
       (zip/replace position {:description description :nesting []}))))
 
 (defn normalize [form]
   (ozip/traverse form
                  should-normalize?
-                 normalize))
+                 normalize-description))
 
 (defn- nest-description [description form]
   (let [position (zip/right form)
