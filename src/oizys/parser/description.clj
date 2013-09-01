@@ -34,7 +34,7 @@
                                      conj
                                      description))))
 
-(defn add-nested [form]
+(defn nest [form]
   (let [description (description form)
         nest-description-fn (partial nest-description description)]
     (ozip/traverse form

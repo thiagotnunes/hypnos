@@ -37,7 +37,7 @@
 (defmacro facts [& _]
   `(do ~@(-> &form
              description/normalize
-             description/add-nested
+             description/nest
              facts-body)))
 
 (defmacro future-fact [& _]
