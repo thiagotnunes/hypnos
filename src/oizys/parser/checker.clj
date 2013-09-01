@@ -2,7 +2,7 @@
   (:require
    [oizys.checkers.core :as checker]))
 
-(def wrapper {'not `complement})
+(def wrappers {'not `complement})
 
 (defn- expected-fn-from [expected]
   (if (list? expected)
@@ -25,7 +25,7 @@
 
 (defn- wrapper-from [expected]
   (when (list? expected)
-    (some wrapper expected)))
+    (some wrappers expected)))
 
 (defn- build-expectation [actual expected]
   (if-let [checker (checker-from expected)]
