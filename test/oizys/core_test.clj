@@ -13,6 +13,12 @@
   (+ 1 1) => 2
   (+ 1 2) => 3)
 
+(fact "two collections are equal when they have the same elements"
+  '(1 2 3) => '(1 2 3)
+  [1 2 3]  => [1 2 3]
+  #{1 2 3} => #{1 2 3}
+  {1 2}    => {1 2})
+
 (fact "facts accept scoping"
   (let [a 1
         b 2]
