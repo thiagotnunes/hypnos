@@ -4,6 +4,7 @@
    [oizys.assertion      :as assertion]
    [oizys.result         :as result]
    [oizys.zip            :as ozip]
+   
    [clojure.zip          :as zip]
    [potemkin             :as potemkin]))
 
@@ -16,24 +17,27 @@
   (-> form
       ozip/remove-right))
 
-(defn- assertion-function [assertion-fn actual expected assertion-symbol]
+(defn- assertion-function-from [assertion-fn actual expected assertion-symbol]
   (with-meta
     `(apply ~assertion-fn [~(checker/checker->function actual expected)
                            '~assertion-symbol
                            '(~actual ~assertion-symbol ~expected)])
     {:oizys-assertion true}))
 
-(defn- assertion->function [form assertion-fn]
+(defn- assertion->function [assertion-fn form]
   (let [actual (ozip/left-node form)
         assertion-symbol (zip/node form)
         expected (ozip/right-node form)]
     (-> form
         remove-actual
         remove-expected
-        (zip/replace (assertion-function assertion-fn
-                                         actual
-                                         expected
-                                         assertion-symbol)))))
+        (zip/replace (assertion-function-from assertion-fn
+                                              actual
+                                              expected
+                                              assertion-symbol)))))
+(def assertion->confirm (partial assertion->function #'assertion/confirm))
+(def assertion->refute (partial assertion->function #'assertion/refute))
+
 
 (defn- with-error-handling [form results]
   (let [assertion (zip/node form)]
@@ -56,12 +60,12 @@
                           #(with-error-handling % `assertion-results##))
          (result/to-stdout ~description assertion-results##))))))
 
-(defn assertions->confirm-functions [form]
+(defn assertions->confirms [form]
   (ozip/traverse form
                  assertion/assertions
-                 #(assertion->function % #'assertion/confirm)))
+                 assertion->confirm))
 
-(defn assertions->refute-functions [form]
+(defn assertions->refutes [form]
   (ozip/traverse form
                  assertion/assertions
-                 #(assertion->function % #'assertion/refute)))
+                 assertion->refute))

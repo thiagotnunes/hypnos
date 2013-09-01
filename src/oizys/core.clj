@@ -22,7 +22,7 @@
   (-> &form
       metadata/annotate
       description/normalize
-      assertion/assertions->refute-functions
+      assertion/assertions->refutes
       assertion/error-handling
       fact-body))
 
@@ -30,7 +30,7 @@
   (-> &form
       metadata/annotate
       description/normalize
-      assertion/assertions->confirm-functions
+      assertion/assertions->confirms
       assertion/error-handling
       fact-body))
 
