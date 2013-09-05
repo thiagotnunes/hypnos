@@ -1,24 +1,16 @@
 (ns oizys.checkers.collections
   (:import
-   [clojure.lang PersistentVector])
+   [clojure.lang IPersistentVector])
   (:require
    [clojure.data        :as data]
    [clojure.set         :as set]
    [oizys.checkers.core :refer [defchecker]]
    [clojure.core.match  :refer [match]]))
 
-(defmacro ^{:oizys-checker-fn true} matches [actual expected]
-  `(fn []
-     ~(if (= (class actual) String)
-        `(re-matches ~expected ~actual)
-        `(match [~actual]
-                [~expected] true
-                :else false))))
-
 (defmulti prefixed?
   (fn [actual expected] [(type actual) (type expected)]))
 
-(defmethod prefixed? [PersistentVector PersistentVector] [actual expected]
+(defmethod prefixed? [IPersistentVector IPersistentVector] [actual expected]
   (let [actual-count (count actual)
         expected-count (count expected)]
     (when (<= expected-count actual-count)
@@ -30,14 +22,11 @@
 (defmethod prefixed? [Object Object] [actual expected]
   (throw (RuntimeException. (str "Cannot perform operation for types " [(type actual) (type expected)]))))
 
-(defchecker starts-with [actual expected]
-  (prefixed? actual expected))
-
 
 (defmulti suffixed?
   (fn [actual expected] [(type actual) (type expected)]))
 
-(defmethod suffixed? [PersistentVector PersistentVector] [actual expected]
+(defmethod suffixed? [IPersistentVector IPersistentVector] [actual expected]
   (let [actual-count (count actual)
         expected-count (count expected)]
     (when (<= expected-count actual-count)
@@ -48,6 +37,18 @@
 
 (defmethod suffixed? [Object Object] [actual expected]
   (throw (RuntimeException. (str "Cannot perform operation for types " [(type actual) (type expected)]))))
+
+
+(defmacro ^{:oizys-checker-fn true} matches [actual expected]
+  `(fn []
+     ~(if (= (class actual) String)
+        `(re-matches ~expected ~actual)
+        `(match [~actual]
+                [~expected] true
+                :else false))))
+
+(defchecker starts-with [actual expected]
+  (prefixed? actual expected))
 
 (defchecker ends-with [actual expected]
   (suffixed? actual expected))
