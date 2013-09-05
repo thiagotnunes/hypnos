@@ -1,21 +1,21 @@
-(ns oizys.parser.metadata
+(ns hypnos.parser.metadata
   (:require
-   [oizys.assertion :as assertion]
-   [oizys.zip       :as ozip]
+   [hypnos.assertion :as assertion]
+   [hypnos.zip       :as hzip]
    
-   [clojure.zip     :as zip]))
+   [clojure.zip :as zip]))
 
 (defn- line-number [node]
   (-> node meta :line))
 
 (defn- left-line-number [form]
-  (-> form ozip/left-node line-number))
+  (-> form hzip/left-node line-number))
 
 (defn- right-line-number [form]
-  (-> form ozip/right-node line-number))
+  (-> form hzip/right-node line-number))
 
 (defn- from-previous-line-number [form]
-  (when-let [previous-line (-> form ozip/previous-node line-number)]
+  (when-let [previous-line (-> form hzip/previous-node line-number)]
     (inc previous-line)))
 
 (defn- guess-line [form base-line]
@@ -35,6 +35,6 @@
 
 (defn annotate [form]
   (let [base-line (or (-> form meta :line) 1)]
-    (ozip/traverse form
+    (hzip/traverse form
                    assertion/assertions
                    #(zip/replace % (annotate-assertion % base-line)))))

@@ -1,14 +1,13 @@
-(ns oizys.core
+(ns hypnos.core
   (:require
-   [oizys.parser.future-fact   :as future-fact]
-   [oizys.parser.description   :as description]
-   [oizys.parser.assertion     :as assertion]
-   [oizys.parser.metadata      :as metadata]
+   [hypnos.parser.future-fact   :as future-fact]
+   [hypnos.parser.description   :as description]
+   [hypnos.parser.assertion     :as assertion]
+   [hypnos.parser.metadata      :as metadata]
+   [hypnos.checkers.collections :as collections]
+   [hypnos.checkers.core        :as checkers]
    
-   [oizys.checkers.collections :as collections]
-   [oizys.checkers.core        :as checkers]
-   
-   [potemkin                   :as potemkin]))
+   [potemkin :as potemkin]))
 
 (defn- fact-body [form]
   (->> form
@@ -46,7 +45,7 @@
       future-fact/warn))
 
 (potemkin/import-vars
- [oizys.checkers.core
+ [hypnos.checkers.core
   
   defchecker
   equal
@@ -55,7 +54,7 @@
   throws
   roughly]
  
- [oizys.checkers.collections
+ [hypnos.checkers.collections
 
   matches
   starts-with

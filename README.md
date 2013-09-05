@@ -1,4 +1,4 @@
-# oizys
+# Hypnos
 
 A Clojure testing library
 

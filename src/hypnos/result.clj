@@ -1,4 +1,4 @@
-(ns oizys.result
+(ns hypnos.result
   (:require
    [colorize.core  :as color]
    [clojure.string :as string]))

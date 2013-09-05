@@ -1,4 +1,4 @@
-(ns oizys.assertion)
+(ns hypnos.assertion)
 
 (declare expected-assertion)
 

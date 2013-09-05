@@ -1,6 +1,6 @@
-(ns oizys.checkers.core-test
+(ns hypnos.checkers.core-test
   (:require
-   [oizys.core :refer :all]))
+   [hypnos.core :refer :all]))
 
 (facts "about truthy checker"
   (fact "anything but nil and false are truthy"

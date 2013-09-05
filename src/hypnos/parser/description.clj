@@ -1,7 +1,7 @@
-(ns oizys.parser.description
+(ns hypnos.parser.description
   (:require
    [clojure.zip :as zip]
-   [oizys.zip   :as ozip]))
+   [hypnos.zip  :as hzip]))
 
 (defn description [form]
   (second form))
@@ -22,7 +22,7 @@
       (zip/replace position {:description description :nesting []}))))
 
 (defn normalize [form]
-  (ozip/traverse form
+  (hzip/traverse form
                  should-normalize?
                  normalize-description))
 
@@ -37,6 +37,6 @@
 (defn nest [form]
   (let [description (description form)
         nest-description-fn (partial nest-description description)]
-    (ozip/traverse form
+    (hzip/traverse form
                    should-normalize?
                    nest-description-fn)))

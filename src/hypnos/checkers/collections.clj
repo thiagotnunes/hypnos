@@ -1,11 +1,12 @@
-(ns oizys.checkers.collections
+(ns hypnos.checkers.collections
   (:import
    [clojure.lang IPersistentVector])
   (:require
-   [clojure.data        :as data]
-   [clojure.set         :as set]
-   [oizys.checkers.core :refer [defchecker]]
-   [clojure.core.match  :refer [match]]))
+   [hypnos.checkers.core :refer [defchecker]]
+   
+   [clojure.data       :as data]
+   [clojure.set        :as set]
+   [clojure.core.match :refer [match]]))
 
 (defmulti prefixed?
   (fn [actual expected] [(type actual) (type expected)]))
@@ -39,7 +40,7 @@
   (throw (RuntimeException. (str "Cannot perform operation for types " [(type actual) (type expected)]))))
 
 
-(defmacro ^{:oizys-checker-fn true} matches [actual expected]
+(defmacro ^{:hypnos-checker-fn true} matches [actual expected]
   `(fn []
      ~(if (= (class actual) String)
         `(re-matches ~expected ~actual)

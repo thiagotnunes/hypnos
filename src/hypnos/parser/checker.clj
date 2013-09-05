@@ -1,6 +1,6 @@
-(ns oizys.parser.checker
+(ns hypnos.parser.checker
   (:require
-   [oizys.checkers.core :as checker]))
+   [hypnos.checkers.core :as checker]))
 
 (def wrappers {'not `complement})
 
@@ -13,7 +13,7 @@
 
 (defn- has-checker-fn? [expected]
   (when-let [expected-fn (expected-fn-from expected)]
-    (-> expected-fn resolve meta :oizys-checker-fn)))
+    (-> expected-fn resolve meta :hypnos-checker-fn)))
 
 (defn- checker-from [expected]
   (when (has-checker-fn? expected)

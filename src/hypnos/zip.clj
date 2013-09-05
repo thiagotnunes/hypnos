@@ -1,4 +1,4 @@
-(ns oizys.zip
+(ns hypnos.zip
   (:require
    [clojure.algo.monads :refer [domonad maybe-m]]
    [clojure.zip         :as zip]))

@@ -1,7 +1,7 @@
-(ns oizys.checkers.core)
+(ns hypnos.checkers.core)
 
 (defmacro defchecker [name params & form]
-  `(defn ~(with-meta name (assoc (meta name) :oizys-checker-fn true)) ~params
+  `(defn ~(with-meta name (assoc (meta name) :hypnos-checker-fn true)) ~params
      (fn []
        ~@form)))
 
@@ -14,7 +14,7 @@
 (defchecker falsey [actual]
   (not actual))
 
-(defmacro ^{:oizys-checker-fn true} throws [actual expected]
+(defmacro ^{:hypnos-checker-fn true} throws [actual expected]
   `(fn []
      (try
        ~actual

@@ -1,6 +1,6 @@
-(ns oizys.checkers.collections-test
+(ns hypnos.checkers.collections-test
   (:require
-   [oizys.core :refer :all]))
+   [hypnos.core :refer :all]))
 
 (facts "about matches"
   (facts "for vectors"

@@ -1,4 +1,4 @@
-(defproject oizys "0.1.0"
+(defproject hypnos "0.1.0"
   :description "Testing framework for clojure"
   :url "http://www.thiagotnunes.com"
   :license {:name "Eclipse Public License"

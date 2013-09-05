@@ -1,33 +1,33 @@
-(ns oizys.parser.assertion
+(ns hypnos.parser.assertion
   (:require
-   [oizys.parser.checker :as checker]
-   [oizys.assertion      :as assertion]
-   [oizys.result         :as result]
-   [oizys.zip            :as ozip]
+   [hypnos.parser.checker :as checker]
+   [hypnos.assertion      :as assertion]
+   [hypnos.result         :as result]
+   [hypnos.zip            :as hzip]
    
-   [clojure.zip          :as zip]
-   [potemkin             :as potemkin]))
+   [clojure.zip :as zip]
+   [potemkin    :as potemkin]))
 
 (defn- remove-actual [form]
   (-> form
-      ozip/remove-left
+      hzip/remove-left
       zip/next))
 
 (defn- remove-expected [form]
   (-> form
-      ozip/remove-right))
+      hzip/remove-right))
 
 (defn- assertion-function-from [assertion-fn actual expected assertion-symbol]
   (with-meta
     `(apply ~assertion-fn [~(checker/checker->function actual expected)
                            '~assertion-symbol
                            '(~actual ~assertion-symbol ~expected)])
-    {:oizys-assertion true}))
+    {:hypnos-assertion true}))
 
 (defn- assertion->function [assertion-fn form]
-  (let [actual (ozip/left-node form)
+  (let [actual (hzip/left-node form)
         assertion-symbol (zip/node form)
-        expected (ozip/right-node form)]
+        expected (hzip/right-node form)]
     (-> form
         remove-actual
         remove-expected
@@ -45,7 +45,7 @@
     (-> form
         (zip/replace (with-meta
                        `(swap! ~results conj ~assertion)
-                       {:oizys-assertion-error-handling true}))
+                       {:hypnos-assertion-error-handling true}))
         zip/down
         zip/rightmost)))
 
@@ -56,17 +56,17 @@
     (potemkin/unify-gensyms
      `(~name ~description
        (let [assertion-results## (atom [])]
-         ~@(ozip/traverse body
-                          #(-> % meta :oizys-assertion)
+         ~@(hzip/traverse body
+                          #(-> % meta :hypnos-assertion)
                           #(with-error-handling % `assertion-results##))
          (result/to-stdout ~description assertion-results##))))))
 
 (defn assertions->confirms [form]
-  (ozip/traverse form
+  (hzip/traverse form
                  assertion/assertions
                  assertion->confirm))
 
 (defn assertions->refutes [form]
-  (ozip/traverse form
+  (hzip/traverse form
                  assertion/assertions
                  assertion->refute))
