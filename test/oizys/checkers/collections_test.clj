@@ -117,3 +117,26 @@
   [1 2 3] => (not (matches [1 _ 4]))
   [1 2 3] => (not (starts-with [2]))
   [1 2 3] => (not (ends-with [2])))
+
+
+(facts "checking collection elements against functions"
+  (fact "verifies that every? elements of the collection"
+    [1 3 5]  => (has every? odd?))
+
+  (fact "verifies that not any element of the collection"
+    #{1 3 5} => (has not-any? even?))
+
+  (fact "verifies that some elements of the collection"
+    '(1 2 3) => (has some odd?))
+
+  (fact "verifies that not every element of the collection"
+    [1 2 3]  => (has not-every? odd?))
+
+  (failing-fact "when quantifier fails"
+    '(1 2 5) => (has every? odd?))
+
+  (fact "multiple functions are given"
+    #{1 2 3} => (has some odd? #(< % 6) #(> % 0)))
+
+  (failing-fact "when one of the functions fails"
+    #{1 2 3} => (has some odd? #(< % 1) #(> % 0))))

@@ -52,3 +52,8 @@
 
 (defchecker ends-with [actual expected]
   (suffixed? actual expected))
+
+(defchecker has [actual quantifier & matchings]
+  (->> matchings
+       (map #(quantifier % actual))
+       (every? true?)))

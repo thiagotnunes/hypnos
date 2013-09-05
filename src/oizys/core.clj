@@ -59,4 +59,5 @@
 
   matches
   starts-with
-  ends-with])
+  ends-with
+  has])
