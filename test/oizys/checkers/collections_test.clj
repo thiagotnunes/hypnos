@@ -2,7 +2,7 @@
   (:require
    [oizys.core :refer :all]))
 
-(facts "about contains"
+(facts "about matches"
   (facts "for vectors"
     (fact "simple matching"
       [1 2 3] => (matches [1 2 3]))
@@ -58,7 +58,14 @@
     
     (failing-fact "matches"
       #{1 2 3} => (matches #{1 2 4})
-      #{1 2 3} => (matches #{1 2}))))
+      #{1 2 3} => (matches #{1 2})))
+
+  (facts "for strings"
+    (fact "regex matching"
+      "hello there" => (matches #"[a-z]* [a-z]*"))
+
+    (failing-fact "regex matching"
+      "hello there" => (matches #"[a-z]*"))))
 
 (facts "about starts-with"
   (fact "for vectors"

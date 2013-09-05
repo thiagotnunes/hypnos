@@ -35,6 +35,7 @@
                                               actual
                                               expected
                                               assertion-symbol)))))
+
 (def assertion->confirm (partial assertion->function #'assertion/confirm))
 (def assertion->refute (partial assertion->function #'assertion/refute))
 

@@ -9,9 +9,11 @@
 
 (defmacro ^{:oizys-checker-fn true} matches [actual expected]
   `(fn []
-     (match [~actual]
-            [~expected] true
-            :else false)))
+     ~(if (= (class actual) String)
+        `(re-matches ~expected ~actual)
+        `(match [~actual]
+                [~expected] true
+                :else false))))
 
 (defmulti prefixed?
   (fn [actual expected] [(type actual) (type expected)]))
