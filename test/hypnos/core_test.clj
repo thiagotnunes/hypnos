@@ -37,7 +37,7 @@
 (facts "about first level nesting"
   (let [x 1]
     (facts "about second level nesting"
-      (let [y 2]                 
+      (let [y 2]
         (fact "facts can be nested within several facts"
           (let [z 3]
             (+ x y) => z))))))
@@ -45,7 +45,7 @@
 (facts "about first level nesting"
   (let [x 1]
     (facts "about second level nesting"
-      (let [y 2]                 
+      (let [y 2]
         (failing-fact "adding two numbers do not output the expected result"
           (let [z 3]
             (+ x z) => y))))))

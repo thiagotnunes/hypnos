@@ -7,7 +7,7 @@
     1 => truthy
     () => truthy
     true => truthy)
-  
+
   (failing-fact "nil and false are not truthy"
     nil => truthy
     false => truthy))

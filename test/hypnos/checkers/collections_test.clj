@@ -39,7 +39,7 @@
     (fact "simple matching"
       {:a 1 :b 2} => (matches {:a 1 :b 2})
       {:d 4 :a 1 :b 2 :c 3} => (matches {:a 1 :b 2}))
-    
+
     (fact "with only matching"
       {:a 1 :b 2} => (matches ({:a 1 :b 2} :only [:a :b])))
 
@@ -55,7 +55,7 @@
   (facts "for sets"
     (fact "simple matching"
       #{1 2 3} => (matches #{1 2 3}))
-    
+
     (failing-fact "matches"
       #{1 2 3} => (matches #{1 2 4})
       #{1 2 3} => (matches #{1 2})))
