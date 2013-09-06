@@ -32,7 +32,7 @@ Simple equality tests:
       [a b] => [1 2])))
 ```
 
-Available checkers:
+Simple checkers:
 
 ```clojure
 (facts "about simple checkers"
@@ -57,7 +57,11 @@ Available checkers:
     0.11 => (roughly 0.1)    ; default to 0.1 error delta
     100.3 => (roughly 100 1) ; custom error delta of 1))
 
+```
 
+Collection checkers:
+
+```clojure
 ; Matches for collections uses clojure.core.match underneath
 (facts "about matches checker for collections"
   (fact "for vectors"
@@ -72,26 +76,16 @@ Available checkers:
   (fact "for sets"
     #{1 2 3} => (matches #{1 2})))
 
-(facts "about matches checker for strings"    
-  (fact "does regex comparison"
-    "hypnos 123" => (matches #"[a-z]+ \d\d\d")))
-
   
 (facts "about starts-with checker"
   (fact "for vectors"
     [1 2 3] => (starts-with [1 2])
-    [1 2 3] => (not (starts-with [2])))
-    
-  (fact "for strings"
-    "hypnos 123" => (starts-with "hyp")))
+    [1 2 3] => (not (starts-with [2]))))
     
 (facts "about ends-with checker"
   (fact "for vectors"
     [1 2 3] => (ends-with [2 3])
-    [1 2 3] => (not (ends-with [1 2])))
-    
-  (fact "for strings"
-    "hypnos 123" => (ends-with "23"))) 
+    [1 2 3] => (not (ends-with [1 2])))) 
 
     
 (facts "about the has checker"
@@ -110,6 +104,46 @@ Available checkers:
     
   (fact "multiple functions can be given"
     #{1 2 3} => (has some odd? #(< % 6) #(> % 0)))
+```
+
+String checkers:
+
+```clojure
+(facts "about matches checker for strings"    
+  (fact "does regex comparison"
+    "hypnos 123" => (matches #"[a-z]+ \d\d\d")))
+  
+(facts "about starts-with checker"   
+  (fact "for strings"
+    "hypnos 123" => (starts-with "hyp")))
+    
+(facts "about ends-with checker"  
+  (fact "for strings"
+    "hypnos 123" => (ends-with "23"))) 
+```
+
+Custom checkers:
+
+```clojure
+(defchecker zero? [actual]
+  (= 0 actual))
+  
+(fact "is zero"
+  (- 1 1) => zero?)
+  
+(defchecker instance-of [actual expected]
+  (instance? expected actual))
+  
+(fact "is valid"
+  1 => (instance-of Number))
+  
+(defchecker contain-keys? [actual & args]
+  (->> args
+       (map #(contains? actual %))
+       (every? true?)))
+  
+(fact "contain keys"
+  {:a 1 :b 2 :c 3} => (contain-keys? :a :b :c))
 ```
 
 Pending tests:
