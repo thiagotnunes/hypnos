@@ -30,3 +30,11 @@
                 (by sum)
                 (where #(= (current-node %) 1)))
     => '(+ (+ 6 7) 2 (+ 6 7) 3 (+ 6 7) 4)))
+
+(fact "replaces left, right and current node"
+  (letfn [(assertion->fn [actual expected assertion] (list 'assertion-fn actual expected))]
+    (replace-in '(test "test" 1 -> 2)
+                [left-node right-node current-node]
+                (by assertion->fn)
+                (where #(= (current-node %) '->)))
+    => '(test "test" (assertion-fn 1 2))))
