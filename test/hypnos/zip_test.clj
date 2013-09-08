@@ -31,6 +31,17 @@
                 (where #(= (current-node %) 1)))
     => '(+ (+ 6 7) 2 (+ 6 7) 3 (+ 6 7) 4)))
 
+(fact "replaces right node"
+  (let [nest (fn [description] (update-in description
+                                         [:nesting]
+                                         conj
+                                         "nested-desc"))
+        result (replace-in '(test {:description "test" :nesting []} 1 -> 1)
+                           [right-node]
+                           (by nest)
+                           (where #(= (current-node %) 'test)))]
+    result => '(test {:description "test" :nesting ["nested-desc"]} 1 -> 1)))
+
 (fact "replaces left, right and current node"
   (letfn [(assertion->fn [actual expected assertion] (list 'assertion-fn actual expected))]
     (replace-in '(test "test" 1 -> 2)

@@ -24,6 +24,17 @@
 (defn remove-right [form]
   (-> form zip/right zip/remove))
 
+(defn insert-left [form node]
+  (-> form
+      (zip/insert-left node)
+      zip/next))
+
+(defn insert-right [form node]
+    (-> form
+      (zip/insert-right node)
+      zip/next))
+
+
 (defn traverse [form pred func]
   (letfn [(traverse-form [form]
             (if (zip/end? form)
@@ -48,12 +59,22 @@
                         left-node    #(-> % remove-left zip/next)
                         right-node   remove-right})
 
+(def insert-fn-mapping {current-node #(zip/replace %1 %2)
+                        left-node insert-left
+                        right-node insert-right})
+
 (defn- remove-nodes [form nodes-fn]
   (let [remove-fn (->> nodes-fn
                        (map #(remove-fn-mapping %))
                        reverse
                        (apply comp))]
     (remove-fn form)))
+
+(defn- insert-node [form replacement nodes-fn]
+  (let [insert-fn (-> nodes-fn
+                      last
+                      insert-fn-mapping)]
+    (insert-fn form replacement)))
 
 (defn replace-in [form nodes-fn by-fn where-fn]
   (letfn [(replace-in-form [form]
@@ -63,8 +84,8 @@
                 (let [nodes ((apply juxt nodes-fn) form)
                       replacement (by-fn nodes)]
                   (recur (-> form
+                             (insert-node replacement nodes-fn)
                              (remove-nodes nodes-fn)
-                             (zip/replace replacement)
                              zip/next)))
                 (recur (zip/next form)))))]
     (-> form
