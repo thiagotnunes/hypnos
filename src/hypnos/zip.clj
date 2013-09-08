@@ -35,3 +35,27 @@
         zip/seq-zip
         traverse-form
         zip/root)))
+
+
+(defn by [func]
+  (fn [nodes-fn form]
+    (let [nodes ((apply juxt nodes-fn) form)]
+      (apply func nodes))))
+
+(defn where [fn]
+  fn)
+
+(defn replace-in [form nodes-fn by-fn where-fn]
+  (letfn [(replace-in-form [form]
+            (if (zip/end? form)
+              form
+              (if (where-fn form)
+                (recur (-> form
+                           (zip/insert-left (by-fn nodes-fn form))
+                           zip/remove
+                           zip/next))
+                (recur (zip/next form)))))]
+    (-> form
+        zip/seq-zip
+        replace-in-form
+        zip/root)))
