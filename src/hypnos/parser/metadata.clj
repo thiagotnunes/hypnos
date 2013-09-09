@@ -1,40 +1,22 @@
 (ns hypnos.parser.metadata
   (:require
    [hypnos.assertion :as assertion]
-   [hypnos.zip       :as hzip]
-   
-   [clojure.zip :as zip]))
+
+   [velcro.core :refer :all]))
 
 (defn- line-number [node]
   (-> node meta :line))
 
-(defn- left-line-number [form]
-  (-> form hzip/left-node line-number))
-
-(defn- right-line-number [form]
-  (-> form hzip/right-node line-number))
-
-(defn- from-previous-line-number [form]
-  (when-let [previous-line (-> form hzip/previous-node line-number)]
-    (inc previous-line)))
-
-(defn- guess-line [form base-line]
-  (or (left-line-number form)
-      (right-line-number form)
-      (from-previous-line-number form)
-      base-line))
-
 (defn- add-line-number [assertion line]
   (with-meta assertion {:line line}))
 
-(defn- annotate-assertion [form base-line]
-  (let [guessed-line (guess-line form base-line)]
-    (-> form
-        zip/node
-        (add-line-number guessed-line))))
+(defn- annotate-assertion [node base-line]
+  (let [guessed-line (or (line-number node) base-line)]
+    (add-line-number node guessed-line)))
 
 (defn annotate [form]
   (let [base-line (or (-> form meta :line) 1)]
-    (hzip/traverse form
-                   assertion/assertions
-                   #(zip/replace % (annotate-assertion % base-line)))))
+    (replace-in form
+                [current-node]
+                (by #(annotate-assertion % base-line))
+                (where #(assertion/assertions (current-node %))))))
