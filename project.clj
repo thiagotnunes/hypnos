@@ -9,4 +9,5 @@
                  [slingshot "0.10.3"]
                  [potemkin "0.3.2"]
                  [colorize "0.1.1" :exclusions [org.clojure/clojure]]
-                 [org.clojure/core.match "0.2.0-rc5"]])
+                 [org.clojure/core.match "0.2.0-rc5"]
+                 [velcro "0.0.2"]])

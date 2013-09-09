@@ -3,10 +3,8 @@
    [hypnos.parser.checker :as checker]
    [hypnos.assertion      :as assertion]
    [hypnos.result         :as result]
-   [hypnos.zip            :as hzip]
-   [hypnos.zip            :refer :all]
+   [velcro.core           :refer :all]
    
-   [clojure.zip :as zip]
    [potemkin    :as potemkin]))
 
 (defn- assertion->function [assertion-fn actual expected assertion-symbol]
@@ -19,14 +17,13 @@
 (def assertion->confirm (partial assertion->function #'assertion/confirm))
 (def assertion->refute (partial assertion->function #'assertion/refute))
 
-(defn- with-error-handling [form results]
-  (let [assertion (zip/node form)]
-    (-> form
-        (zip/replace (with-meta
-                       `(swap! ~results conj ~assertion)
-                       {:hypnos-assertion-error-handling true}))
-        zip/down
-        zip/rightmost)))
+(defn- with-error-handling [assertion results]
+  (with-meta
+    `(swap! ~results conj ~assertion)
+    {:hypnos-assertion-error-handling true}))
+
+(defn assertion? [node]
+  (-> node meta :hypnos-assertion))
 
 (defn error-handling [form]
   (let [name (first form)
@@ -35,9 +32,10 @@
     (potemkin/unify-gensyms
      `(~name ~description
        (let [assertion-results## (atom [])]
-         ~@(hzip/traverse body
-                          #(-> % meta :hypnos-assertion)
-                          #(with-error-handling % `assertion-results##))
+         ~@(replace-in body
+                       [current-node]
+                       (by #(with-error-handling % `assertion-results##))
+                       (where #(assertion? (current-node %))))
          (result/to-stdout ~description assertion-results##))))))
 
 (defn assertions->confirms [form]
