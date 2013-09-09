@@ -1,6 +1,7 @@
 (ns hypnos.core-test
   (:require
    [hypnos.core        :refer :all]
+   
    [support.calculator :as calculator]))
 
 (fact "1 is equal to 1"

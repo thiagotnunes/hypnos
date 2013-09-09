@@ -3,8 +3,8 @@
    [hypnos.parser.checker :as checker]
    [hypnos.assertion      :as assertion]
    [hypnos.result         :as result]
-   [velcro.core           :refer :all]
-   
+
+   [velcro.core :refer :all]
    [potemkin    :as potemkin]))
 
 (defn- assertion->function [assertion-fn actual expected assertion-symbol]

@@ -1,6 +1,6 @@
 (ns hypnos.parser.description
   (:require
-   [hypnos.zip :refer :all]))
+   [velcro.core :refer :all]))
 
 (def has-description #{'fact 'future-fact 'failing-fact})
 
@@ -22,7 +22,6 @@
               [right-node]
               (by normalize-description)
               (where #(has-description (current-node %)))))
-
 
 (defn- nest-description [description current-description]
   (update-in current-description
