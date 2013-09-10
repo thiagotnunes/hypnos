@@ -3,6 +3,7 @@
    [hypnos.parser.future-fact   :as future-fact]
    [hypnos.parser.description   :as description]
    [hypnos.parser.assertion     :as assertion]
+   [hypnos.parser.provided      :as provided]
    [hypnos.parser.metadata      :as metadata]
    [hypnos.checkers.collections :as collections]
    [hypnos.checkers.core        :as checkers]
@@ -27,6 +28,7 @@
 
 (defmacro fact [& _]
   (-> &form
+      provided/provided->mocks
       metadata/annotate
       description/normalize
       assertion/assertions->confirms
