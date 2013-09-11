@@ -11,7 +11,7 @@
   `(alter-var-root (var ~func)
                    (fn [original-fn##]
                      (swap! ~original-fns assoc (var ~func) original-fn##)
-                     ~mock-fn)))
+                     (fn [] ~mock-fn))))
 
 (defn- mocks [form]
   (let [mocks (second form)
