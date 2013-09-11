@@ -1,22 +1,33 @@
 (ns hypnos.parser.provided
   (:require
-   [velcro.core :refer :all]))
+   [velcro.core :refer :all]
+   [potemkin :as potemkin]))
 
-(defn- revert [func original-fn]
-  `(alter-var-root (var ~func) (fn [new-fn] ~original-fn)))
+(defn revert-to [original-fns]
+  (doseq [[func original-fn] @original-fns]
+    (alter-var-root func (fn [_] original-fn))))
 
-(defn- mocks [_ to-mock]
-  (let [func (-> to-mock first first)
-        mock-fn (second to-mock)]
-    `(do
-       (alter-var-root (var ~func)
-                       (fn [original-fn#]
-                         (fn [] ~mock-fn))))))
+(defn mock [func mock-fn original-fns]
+  `(alter-var-root (var ~func)
+                   (fn [original-fn##]
+                     (swap! ~original-fns assoc (var ~func) original-fn##)
+                     ~mock-fn)))
+
+(defn- mocks [form]
+  (let [mocks (second form)
+        func (-> mocks first first)
+        mock-fn (-> mocks second)
+        body (drop 2 form)]
+    (potemkin/unify-gensyms
+     `(let [original-fns## (atom {})]
+        ~(mock func mock-fn `original-fns##)
+        ~@body
+        (revert-to original-fns##)))))
 
 (defn provided->mocks [form]
   (replace-in form
-              [current-node right-node]
-              (by-spliced mocks)
+              [up-node]
+              (by mocks)
               (where #(= (current-node %) 'provided))))
 
 

@@ -4,6 +4,8 @@
 
 (defn- one [] 1)
 
-(fact "mocks argumentless function"
-  (provided [(one) 2]
-    (one) => 2))
+(fact "mocks argumentless function within the scope"
+  (provided [(one) (fn [] 2)]
+    (one) => 2
+    (one) => 2)
+  (one) => 1)
