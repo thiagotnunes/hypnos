@@ -42,20 +42,22 @@
     (doseq [[func mock] function-mocks-pairs]
       (mock! func mock original-fns))))
 
-(defn mocks! [form]
-  (let [mocks (second form)
-        body (drop 2 form)]
-    (potemkin/unify-gensyms
-     `(let [original-fns## (atom {})]
-        (create-mocks! '~mocks original-fns##)
-        ~@body
-        (revert-to! original-fns##)))))
+(defn mocks-fn-from! [errors]
+  (fn [form]
+    (let [mocks (second form)
+          body (drop 2 form)]
+      (potemkin/unify-gensyms
+       `(let [original-fns## (atom {})]
+          (create-mocks! '~mocks original-fns##)
+          ~@body
+          (revert-to! original-fns##))))))
 
-(defn provided->mocks [form]
-  (replace-in form
-              [up-node]
-              (by mocks!)
-              (where #(= (current-node %) 'provided))))
+(defn provided->mocks [errors]
+  (fn [form]
+    (replace-in form
+                [up-node]
+                (by (mocks-fn-from! errors))
+                (where #(= (current-node %) 'provided)))))
 
 
 

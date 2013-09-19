@@ -1,11 +1,9 @@
-(ns hypnos.parser.errors
-  (:require
-   [hypnos.result :as result]))
+(ns hypnos.parser.errors)
 
 (defn errors-var! []
   (gensym "errors_"))
 
-(defn error-handling-fn [errors]
+(defn error-handling-fn [errors result-fn]
   (fn [form]
     (let [name (first form)
           description (second form)
@@ -13,4 +11,4 @@
       `(~name ~description
               (let [~errors (atom [])]
                 ~@body
-                (result/to-stdout ~description ~errors))))))
+                (~result-fn ~description ~errors))))))
