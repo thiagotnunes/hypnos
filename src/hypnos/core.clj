@@ -5,6 +5,7 @@
    [hypnos.parser.assertion     :as assertion]
    [hypnos.parser.provided      :as provided]
    [hypnos.parser.metadata      :as metadata]
+   [hypnos.parser.errors        :as errors]
    [hypnos.checkers.collections :as collections]
    [hypnos.checkers.core        :as checkers]
    
@@ -19,21 +20,28 @@
   (drop 2 form))
 
 (defmacro failing-fact [& _]
-  (-> &form
-      metadata/annotate
-      description/normalize
-      assertion/assertions->refutes
-      assertion/error-handling
-      fact-body))
+  (let [errors (errors/errors-var!)
+        with-error-handling (errors/error-handling-fn errors)
+        assertions->refutes (assertion/assertions->refutes errors)]
+    (-> &form
+        description/normalize
+        metadata/annotate
+        with-error-handling
+        assertions->refutes
+        fact-body)))
 
 (defmacro fact [& _]
-  (-> &form
-      provided/provided->mocks
-      metadata/annotate
-      description/normalize
-      assertion/assertions->confirms
-      assertion/error-handling
-      fact-body))
+  (let [errors (errors/errors-var!)
+        with-error-handling (errors/error-handling-fn errors)
+        ;provided->mocks (provided/provided->mocks errors-var)
+        assertions->confirms (assertion/assertions->confirms errors)]
+    (-> &form
+        description/normalize
+        metadata/annotate
+        with-error-handling
+        provided/provided->mocks
+        assertions->confirms
+        fact-body)))
 
 (defmacro facts [& _]
   `(do ~@(-> &form

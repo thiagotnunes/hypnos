@@ -7,45 +7,32 @@
    [velcro.core :refer :all]
    [potemkin    :as potemkin]))
 
-(defn- assertion->function [assertion-fn actual expected assertion-symbol]
-  (with-meta
-    `(apply ~assertion-fn [~(checker/checker->function actual expected)
-                           '~assertion-symbol
-                           '(~actual ~assertion-symbol ~expected)])
-    {:hypnos-assertion true}))
+(defn- assertion->function [assertion-fn
+                            errors
+                            actual
+                            expected
+                            assertion-symbol]
+  `(~assertion-fn ~errors
+                  ~(checker/checker->function actual expected)
+                  '~assertion-symbol
+                  '(~actual ~assertion-symbol ~expected)))
 
-(def assertion->confirm (partial assertion->function #'assertion/confirm))
-(def assertion->refute (partial assertion->function #'assertion/refute))
+(defn assertion->confirm [errors]
+  (partial assertion->function #'assertion/confirm errors))
 
-(defn- with-error-handling [assertion results]
-  (with-meta
-    `(swap! ~results conj ~assertion)
-    {:hypnos-assertion-error-handling true}))
+(defn assertion->refute [errors]
+  (partial assertion->function #'assertion/refute errors))
 
-(defn assertion? [node]
-  (-> node meta :hypnos-assertion))
+(defn assertions->confirms [errors]
+  (fn [form]
+    (replace-in form
+                [left-node right-node current-node]
+                (by (assertion->confirm errors))
+                (where #(assertion/assertions (current-node %))))))
 
-(defn error-handling [form]
-  (let [name (first form)
-        description (second form)
-        body (drop 2 form)]
-    (potemkin/unify-gensyms
-     `(~name ~description
-       (let [assertion-results## (atom [])]
-         ~@(replace-in body
-                       [current-node]
-                       (by #(with-error-handling % `assertion-results##))
-                       (where #(assertion? (current-node %))))
-         (result/to-stdout ~description assertion-results##))))))
-
-(defn assertions->confirms [form]
-  (replace-in form
-              [left-node right-node current-node]
-              (by assertion->confirm)
-              (where #(assertion/assertions (current-node %)))))
-
-(defn assertions->refutes [form]
-  (replace-in form
-              [left-node right-node current-node]
-              (by assertion->refute)
-              (where #(assertion/assertions (current-node %)))))
+(defn assertions->refutes [errors]
+  (fn [form]
+    (replace-in form
+                [left-node right-node current-node]
+                (by (assertion->refute errors))
+                (where #(assertion/assertions (current-node %))))))
