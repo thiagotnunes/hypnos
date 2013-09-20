@@ -3,7 +3,8 @@
    [hypnos.parser.description :as description]
    [hypnos.output.repl        :as output]))
 
-(defn warn [form]
-  (-> form
-      description/description
-      output/print-pending))
+(defn warn [result-fn]
+  (fn [form]
+    (-> form
+        description/description
+        result-fn)))

@@ -26,11 +26,11 @@
           namespace
           line))
 
-(defn print-pending [description]
+(defn pendings [description]
   (printf (color/yellow "PENDING: \"%s\"\n")
           (format-description description)))
 
-(defn print [description assertions-result]
+(defn failures [description assertions-result]
   (when-let [errors (->> assertions-result
                          deref
                          (remove nil?)
