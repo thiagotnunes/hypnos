@@ -1,6 +1,6 @@
 (ns hypnos.core-test
   (:require
-   [hypnos.core        :refer :all]
+   [hypnos.core :refer :all]
    
    [support.calculator :as calculator]))
 

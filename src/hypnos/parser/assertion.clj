@@ -2,7 +2,6 @@
   (:require
    [hypnos.parser.checker :as checker]
    [hypnos.assertion      :as assertion]
-   [hypnos.result         :as result]
 
    [velcro.core :refer :all]
    [potemkin    :as potemkin]))

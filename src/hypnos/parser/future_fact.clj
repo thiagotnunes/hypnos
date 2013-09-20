@@ -1,9 +1,9 @@
 (ns hypnos.parser.future-fact
   (:require
    [hypnos.parser.description :as description]
-   [hypnos.result             :as result]))
+   [hypnos.output.repl        :as output]))
 
 (defn warn [form]
   (-> form
       description/description
-      result/print-pending))
+      output/print-pending))

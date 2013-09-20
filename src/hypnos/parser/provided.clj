@@ -17,30 +17,30 @@
                        (into {}))]
     [func formatted]))
 
-(defn- mock-fn-from [mock]
+(defn- mock-fn-from [mock errors]
   (fn [& args]
-    (let [return (mock (seq args))]
+    (if-let [return (mock (seq args))]
       return)))
 
-(defn- mock! [func mock original-fns]
+(defn- mock! [func mock errors original-fns]
   (let [func-var (resolve func)]
     (alter-var-root func-var
                     (fn [original-fn]
                       (swap! original-fns assoc func-var original-fn)
-                      (mock-fn-from mock)))))
+                      (mock-fn-from mock errors)))))
 
 (defn revert-to! [original-fns]
   (doseq [[func original-fn] @original-fns]
     (alter-var-root func (fn [_] original-fn))))
 
-(defn create-mocks! [mocks original-fns]
+(defn create-mocks! [mocks errors original-fns]
   (let [function-mocks-pairs (->> mocks
                                   (partition 2)
                                   (group-by function-name)
                                   (map format-mocks)
                                   (into {}))]
     (doseq [[func mock] function-mocks-pairs]
-      (mock! func mock original-fns))))
+      (mock! func mock errors original-fns))))
 
 (defn mocks-fn-from! [errors]
   (fn [form]
@@ -48,7 +48,7 @@
           body (drop 2 form)]
       (potemkin/unify-gensyms
        `(let [original-fns## (atom {})]
-          (create-mocks! '~mocks original-fns##)
+          (create-mocks! '~mocks ~errors original-fns##)
           ~@body
           (revert-to! original-fns##))))))
 

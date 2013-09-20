@@ -8,7 +8,7 @@
    [hypnos.parser.errors        :as errors]
    [hypnos.checkers.collections :as collections]
    [hypnos.checkers.core        :as checkers]
-   [hypnos.result               :as result]
+   [hypnos.output.repl          :as output]
    
    [potemkin :as potemkin]))
 
@@ -22,7 +22,7 @@
 
 (defmacro failing-fact [& _]
   (let [errors (errors/errors-var!)
-        with-error-handling (errors/error-handling-fn errors result/to-stdout)
+        with-error-handling (errors/error-handling-fn errors output/print)
         assertions->refutes (assertion/assertions->refutes errors)]
     (-> &form
         description/normalize
@@ -33,7 +33,7 @@
 
 (defmacro fact [& _]
   (let [errors (errors/errors-var!)
-        with-error-handling (errors/error-handling-fn errors result/to-stdout)
+        with-error-handling (errors/error-handling-fn errors output/print)
         provided->mocks (provided/provided->mocks errors)
         assertions->confirms (assertion/assertions->confirms errors)]
     (-> &form
