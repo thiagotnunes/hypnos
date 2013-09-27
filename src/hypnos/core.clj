@@ -3,10 +3,10 @@
    [hypnos.parser.future-fact   :as future-fact]
    [hypnos.parser.description   :as description]
    [hypnos.parser.assertion     :as assertion]
-   [hypnos.parser.provided      :as provided]
    [hypnos.parser.metadata      :as metadata]
    [hypnos.parser.output        :as output]
    [hypnos.parser.errors        :as errors]
+   [hypnos.parser.mock          :as mock]
    [hypnos.checkers.collections :as collections]
    [hypnos.checkers.core        :as checkers]
    [hypnos.output.repl          :as repl]
@@ -36,7 +36,7 @@
 (defmacro fact [& _]
   (let [errors (errors/errors-var!)
         add-error-handling (errors/error-handling-fn errors)
-        parse-mocks (provided/provided->mocks errors)
+        parse-mocks (mock/expectations->mocks errors)
         parse-assertions (assertion/assertions->confirms errors)
         add-output-printing (output/printing-fn errors repl/result)]
     (-> &form

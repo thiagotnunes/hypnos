@@ -1,4 +1,4 @@
-(ns hypnos.parser.provided
+(ns hypnos.parser.mock
   (:require
    [velcro.core :refer :all]
    [potemkin    :as potemkin]))
@@ -52,19 +52,9 @@
           ~@body
           (revert-to! original-fns##))))))
 
-(defn provided->mocks [errors]
+(defn expectations->mocks [errors]
   (fn [form]
     (replace-in form
                 [up-node]
                 (by (mocks-fn-from! errors))
                 (where #(= (current-node %) 'provided)))))
-
-
-
-
-
-
-
-
-
-
