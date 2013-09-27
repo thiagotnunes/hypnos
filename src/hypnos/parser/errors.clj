@@ -3,12 +3,11 @@
 (defn errors-var! []
   (gensym "errors_"))
 
-(defn error-handling-fn [errors result-fn]
+(defn error-handling-fn [errors]
   (fn [form]
     (let [name (first form)
           description (second form)
           body (drop 2 form)]
       `(~name ~description
-              (let [~errors (atom [])]
-                ~@body
-                (~result-fn ~description ~errors))))))
+              ~(with-meta `(let [~errors (atom [])] ~@body)
+                 {:hypnos-errors true})))))

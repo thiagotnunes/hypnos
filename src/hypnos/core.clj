@@ -22,26 +22,29 @@
 
 (defmacro failing-fact [& _]
   (let [errors (errors/errors-var!)
-        with-error-handling (errors/error-handling-fn errors output/failures)
-        assertions->refutes (assertion/assertions->refutes errors)]
+        add-error-handling (errors/error-handling-fn errors)
+        parse-assertions (assertion/assertions->refutes errors)
+        add-output-printing (output/add-printing-fn errors)]
     (-> &form
         description/normalize
         metadata/annotate
-        with-error-handling
-        assertions->refutes
+        parse-assertions
+        add-error-handling
         fact-body)))
 
 (defmacro fact [& _]
   (let [errors (errors/errors-var!)
-        with-error-handling (errors/error-handling-fn errors output/failures)
-        provided->mocks (provided/provided->mocks errors)
-        assertions->confirms (assertion/assertions->confirms errors)]
+        add-error-handling (errors/error-handling-fn errors)
+        parse-mocks (provided/provided->mocks errors)
+        parse-assertions (assertion/assertions->confirms errors)
+        add-output-printing (output/add-printing-fn errors)]
     (-> &form
         description/normalize
         metadata/annotate
-        with-error-handling
-        provided->mocks
-        assertions->confirms
+        parse-mocks
+        parse-assertions
+        add-error-handling
+        add-output-printing
         fact-body)))
 
 (defmacro facts [& _]
@@ -51,10 +54,10 @@
              facts-body)))
 
 (defmacro future-fact [& _]
-  (let [warn (future-fact/warn output/pendings)]
+  (let [add-output-printing (future-fact/warn output/pendings)]
     (-> &form
         description/normalize
-        warn)))
+        add-output-printing)))
 
 (potemkin/import-vars
  [hypnos.checkers.core
