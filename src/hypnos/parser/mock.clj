@@ -17,17 +17,22 @@
                        (into {}))]
     [func formatted]))
 
-(defn- mock-fn-from [mock errors]
+(defn- mock-fn-from [func mock errors]
   (fn [& args]
     (if-let [return (mock (seq args))]
-      return)))
+      return
+      (do
+        (swap! errors conj {:type :mock
+                            :args args
+                            :func func})
+        nil))))
 
 (defn- mock! [func mock errors original-fns]
   (let [func-var (resolve func)]
     (alter-var-root func-var
                     (fn [original-fn]
                       (swap! original-fns assoc func-var original-fn)
-                      (mock-fn-from mock errors)))))
+                      (mock-fn-from func-var mock errors)))))
 
 (defn revert-to! [original-fns]
   (doseq [[func original-fn] @original-fns]

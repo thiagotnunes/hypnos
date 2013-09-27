@@ -26,6 +26,11 @@
           namespace
           line))
 
+(defmethod print-failure :mock
+  [{func :func
+    args :args}]
+  (printf (color/white "\tYou never said " func " would be called with args " args "\n")))
+
 (defn pending [description]
   (printf (color/yellow "PENDING: \"%s\"\n")
           (format-description description)))
