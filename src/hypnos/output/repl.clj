@@ -1,10 +1,7 @@
 (ns hypnos.output.repl
   (:require
    [colorize.core  :as color]
-   [clojure.string :as string]
-   [velcro.core    :refer :all]
-
-   [hypnos.parser.description :as description]))
+   [clojure.string :as string]))
 
 (defn- format-description [{description :description nesting :nesting}]
   (string/join " - " (conj nesting description)))
@@ -29,11 +26,11 @@
           namespace
           line))
 
-(defn pendings [description]
+(defn pending [description]
   (printf (color/yellow "PENDING: \"%s\"\n")
           (format-description description)))
 
-(defn print-output [description assertions-result]
+(defn result [description assertions-result]
   (when-let [errors (->> assertions-result
                          deref
                          (remove nil?)
@@ -43,15 +40,3 @@
     (doseq [error errors]
       (print-failure error))
     (println "")))
-
-(defn with-printing [errors description form]
-  (concat form
-          `((print-output ~description ~errors))))
-
-(defn add-printing-fn [errors]
-  (fn [form]
-    (let [description (description/description form)]
-      (replace-in form
-                  [current-node]
-                  (by (partial with-printing errors description))
-                  (where #(-> % current-node meta :hypnos-errors))))))

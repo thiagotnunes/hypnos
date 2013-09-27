@@ -5,10 +5,11 @@
    [hypnos.parser.assertion     :as assertion]
    [hypnos.parser.provided      :as provided]
    [hypnos.parser.metadata      :as metadata]
+   [hypnos.parser.output        :as output]
    [hypnos.parser.errors        :as errors]
    [hypnos.checkers.collections :as collections]
    [hypnos.checkers.core        :as checkers]
-   [hypnos.output.repl          :as output]
+   [hypnos.output.repl          :as repl]
    
    [potemkin :as potemkin]))
 
@@ -24,7 +25,7 @@
   (let [errors (errors/errors-var!)
         add-error-handling (errors/error-handling-fn errors)
         parse-assertions (assertion/assertions->refutes errors)
-        add-output-printing (output/add-printing-fn errors)]
+        add-output-printing (output/printing-fn errors repl/result)]
     (-> &form
         description/normalize
         metadata/annotate
@@ -37,7 +38,7 @@
         add-error-handling (errors/error-handling-fn errors)
         parse-mocks (provided/provided->mocks errors)
         parse-assertions (assertion/assertions->confirms errors)
-        add-output-printing (output/add-printing-fn errors)]
+        add-output-printing (output/printing-fn errors repl/result)]
     (-> &form
         description/normalize
         metadata/annotate
@@ -54,7 +55,7 @@
              facts-body)))
 
 (defmacro future-fact [& _]
-  (let [add-output-printing (future-fact/warn output/pendings)]
+  (let [add-output-printing (future-fact/warn repl/pending)]
     (-> &form
         description/normalize
         add-output-printing)))
