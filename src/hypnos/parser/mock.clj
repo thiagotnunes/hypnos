@@ -1,7 +1,6 @@
 (ns hypnos.parser.mock
   (:require
-   [velcro.core :refer :all]
-   [potemkin    :as potemkin]))
+   [velcro.core :refer :all]))
 
 (defn- function-name [element]
   (-> element first first))
@@ -17,49 +16,45 @@
                        (into {}))]
     [func formatted]))
 
-(defn- mock-fn-from [func mock errors]
+(defn- expectations->fns-returns [expectations]
+  (->> expectations
+       (partition 2)
+       (group-by function-name)
+       (map format-mocks)
+       (into {})))
+
+(defn- mock-fn-from [args-return-map]
   (fn [& args]
-    (if-let [return (mock (seq args))]
-      return
-      (do
-        (swap! errors conj {:type :mock
-                            :args args
-                            :func func})
-        nil))))
+    (args-return-map (seq args))))
 
-(defn- mock! [func mock errors original-fns]
-  (let [func-var (resolve func)]
-    (alter-var-root func-var
-                    (fn [original-fn]
-                      (swap! original-fns assoc func-var original-fn)
-                      (mock-fn-from func-var mock errors)))))
+(defn create-mocks! [expectations context]
+  (doseq [[func args-return-map] (expectations->fns-returns expectations)]
+    (let [func-var (resolve func)]
+      (alter-var-root func-var
+                      (fn [original-fn]
+                        (swap! context conj {:original-fn original-fn
+                                             :func func-var
+                                             :number-of-calls 0
+                                             :expected-with (keys args-return-map)
+                                             :called-with []})
+                        (mock-fn-from args-return-map))))))
 
-(defn revert-to! [original-fns]
-  (doseq [[func original-fn] @original-fns]
+(defn revert-to! [context]
+  (doseq [{original-fn :original-fn func :func} @context]
     (alter-var-root func (fn [_] original-fn))))
 
-(defn create-mocks! [mocks errors original-fns]
-  (let [function-mocks-pairs (->> mocks
-                                  (partition 2)
-                                  (group-by function-name)
-                                  (map format-mocks)
-                                  (into {}))]
-    (doseq [[func mock] function-mocks-pairs]
-      (mock! func mock errors original-fns))))
-
-(defn mocks-fn-from! [errors]
+(defn mocks! [errors]
   (fn [form]
-    (let [mocks (second form)
+    (let [expectations (second form)
           body (drop 2 form)]
-      (potemkin/unify-gensyms
-       `(let [original-fns## (atom {})]
-          (create-mocks! '~mocks ~errors original-fns##)
-          ~@body
-          (revert-to! original-fns##))))))
+      `(let [context# (atom [])]
+         (create-mocks! '~expectations context#)
+         ~@body
+         (revert-to! context#)))))
 
 (defn expectations->mocks [errors]
   (fn [form]
     (replace-in form
                 [up-node]
-                (by (mocks-fn-from! errors))
+                (by (mocks! errors))
                 (where #(= (current-node %) 'provided)))))
