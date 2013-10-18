@@ -26,10 +26,15 @@
           namespace
           line))
 
-(defmethod print-failure :mock
+(defmethod print-failure :mock-args
   [{func :func
-    args :args}]
-  (printf (color/white "\tYou never said " func " would be called with args " args "\n")))
+    unexpected-args :unexpected-args}]
+  (doseq [args unexpected-args]
+    (printf (color/white "\tYou never said " func " would be called with args " args "\n"))))
+
+(defmethod print-failure :mock-number-of-calls
+  [{func :func}]
+  (printf (color/white "\tExpected " func " to be called at least once\n")))
 
 (defn pending [description]
   (printf (color/yellow "PENDING: \"%s\"\n")
